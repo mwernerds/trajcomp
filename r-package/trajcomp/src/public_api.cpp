@@ -534,10 +534,6 @@ SEXP trajectory_distances(NumericMatrix S, NumericMatrix T, int hSetting)
 //   return wrap (distances);
 // }
 
-/*
- * Marie
- * encodes a trajactory
- * */
 // [[Rcpp::export]]
 String encode(NumericMatrix T, std::string feature){
 
@@ -555,7 +551,7 @@ String encode(NumericMatrix T, std::string feature){
 }
 
 /*
- * Marie
+ * 
  * returns NumericVector: distance1, distance2, ...
  * 
  * */
