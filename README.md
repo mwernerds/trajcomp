@@ -1,0 +1,2 @@
+# trajcomp
+Trajectory Computing Library
