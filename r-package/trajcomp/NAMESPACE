@@ -1,0 +1,3 @@
+useDynLib(trajcomp)
+exportPattern("^[[:alpha:]]+")
+importFrom(Rcpp, evalCpp)
