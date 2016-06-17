@@ -1,6 +1,11 @@
 Hey there,
 
-compile with make, you might need to adjust the Makefile, if you did not
+for more information on what is going on here, check out the article
+
+http://martinwerner.de/code/implementing-the-traclus-clustering-algorithm
+
+
+...compile with make, you might need to adjust the Makefile, if you did not
 copy the Github project completely. Point it to the trajcomp headers...
 
 After unpacking, the following shows a typical usage:
