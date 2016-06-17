@@ -1,0 +1,44 @@
+Hey there,
+
+compile with make, you might need to adjust the Makefile, if you did not
+copy the Github project completely. Point it to the trajcomp headers...
+
+After unpacking, the following shows a typical usage:
+
+make 
+
+This generates the executable traclus.
+
+This can be used as follows:
+
+# Clustering prague with eps=25 and minLines=5
+./traclus prague.XYI 25 5
+
+The output goes directly into a CSV called clusternig.dat with columns
+
+x1 y1 x2 y2 trajectory_index cluster
+200 1552  243.88 1551.91  0 0
+243.88 1551.91  251.96 1551.24  0 0
+251.96 1551.24  263.27 1548.95  0 0
+263.27 1548.95  271.04 1546.21  0 0
+271.04 1546.21  281.28 1541.22  0 0
+281.28 1541.22  299.78 1528.16  0 0
+299.78 1528.16  311.98 1517  0 0
+311.98 1517  326.69 1501.17  0 0
+326.69 1501.17  361.61 1457.71  0 0
+
+The first four columns give the segment (as segmented by the segmentation
+functional). The fifth column tells us from which trajectory the segment
+was extracted and the last column is the cluster ID.
+
+True clusters are non-negative numbers,
+Noise is -1 and rejected due to too few different trajectories (minLines 
+is meant against numbers of trajectories not numbers of segments) 
+are -2
+
+For this example, we have actually two cluster, no noise and some
+rejected segments.
+
+Let us use R to show the result: Start an R session (R) and enter
+>source("show.R")
+The plot looks like the PDF in this directory
