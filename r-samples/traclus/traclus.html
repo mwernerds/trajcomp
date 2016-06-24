@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="generator" content="pandoc">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+  <title></title>
+  <style type="text/css">code{white-space: pre;}</style>
+  <style type="text/css">
+div.sourceCode { overflow-x: auto; }
+table.sourceCode, tr.sourceCode, td.lineNumbers, td.sourceCode {
+  margin: 0; padding: 0; vertical-align: baseline; border: none; }
+table.sourceCode { width: 100%; line-height: 100%; }
+td.lineNumbers { text-align: right; padding-right: 4px; padding-left: 4px; color: #aaaaaa; border-right: 1px solid #aaaaaa; }
+td.sourceCode { padding-left: 5px; }
+code > span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code > span.dt { color: #902000; } /* DataType */
+code > span.dv { color: #40a070; } /* DecVal */
+code > span.bn { color: #40a070; } /* BaseN */
+code > span.fl { color: #40a070; } /* Float */
+code > span.ch { color: #4070a0; } /* Char */
+code > span.st { color: #4070a0; } /* String */
+code > span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code > span.ot { color: #007020; } /* Other */
+code > span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code > span.fu { color: #06287e; } /* Function */
+code > span.er { color: #ff0000; font-weight: bold; } /* Error */
+code > span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+code > span.cn { color: #880000; } /* Constant */
+code > span.sc { color: #4070a0; } /* SpecialChar */
+code > span.vs { color: #4070a0; } /* VerbatimString */
+code > span.ss { color: #bb6688; } /* SpecialString */
+code > span.im { } /* Import */
+code > span.va { color: #19177c; } /* Variable */
+code > span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code > span.op { color: #666666; } /* Operator */
+code > span.bu { } /* BuiltIn */
+code > span.ex { } /* Extension */
+code > span.pp { color: #bc7a00; } /* Preprocessor */
+code > span.at { color: #7d9029; } /* Attribute */
+code > span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code > span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code > span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+  </style>
+  <!--[if lt IE 9]>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7.3/html5shiv-printshiv.min.js"></script>
+  <![endif]-->
+</head>
+<body>
+<h1 id="trajectory-clustering">Trajectory Clustering</h1>
+<p>Trajectory Clustering aims to group spatial trajectories into clusters. The TRACLUS framework has been defined which first splits trajectories into line segments, then groups these with a variant of DBSCAN. Finally, these trajectory segments are cleaned up for clusters which come from too few <em>different</em> source trajectories.</p>
+<h2 id="running-traclus">Running Traclus</h2>
+<p>First, we will have to load the trajcomp R package. From this package, we load a small dataset (smallprague) taken from a computer game.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(trajcomp)
+<span class="kw">data</span>(smallprague)</code></pre></div>
+<p>Now let us first have a look at this dataset. It contains two clear clusters of trajectories and is not too large for the original TRACLUS algorithm:</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">plot</span>(smallprague,<span class="dt">t=</span><span class="st">&quot;l&quot;</span>);</code></pre></div>
+<figure>
+<img src="figures/traclus-unnamed-chunk-2-1.png" alt="Figure: Plot of the complete dataset" /><figcaption>Figure: Plot of the complete dataset</figcaption>
+</figure>
+<p>This dataset shall now be clustered using our TRACLUS algorithm implementation using a threshold of 25 and a number of lines 5.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">segments =<span class="st"> </span><span class="kw">traclus</span>(smallprague, <span class="dv">25</span>,<span class="dv">5</span>)</code></pre></div>
+<pre><code>## Have 24 trajectories</code></pre>
+<p>This now has segmented the trajectories in TRACLUS and clustered them according to their total distance as described in the TRACLUS paper. Let us look at the result:</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">head</span>(segments)</code></pre></div>
+<pre><code>##       x1      y1     x2      y2 trajectory_index cluster
+## 1 200.00 1552.00 243.88 1551.91                0       0
+## 2 243.88 1551.91 251.96 1551.24                0       0
+## 3 251.96 1551.24 263.27 1548.95                0       0
+## 4 263.27 1548.95 271.04 1546.21                0       0
+## 5 271.04 1546.21 281.28 1541.22                0       0
+## 6 281.28 1541.22 299.78 1528.16                0       0</code></pre>
+<p>We are given all segments (this is important when you want to debug your segmentation) together with the <em>zero-based</em> trajectory index, they came from and a cluster id.</p>
+<p>The non-negative cluster id's are actual clusters, a cluster id of -1 denotes noise and a cluster id of -2 denotes clusters of segments such that the segments are more than minLines, but those segments don't come from minLines <em>different</em> trajectories.</p>
+<h2 id="using-the-results">Using the results</h2>
+<p>First of all, let us look at all of those segments. This is a bit tricky, as segments are stored in four columns giving x/y coordinates of start and end point. It is best to transform this into a matrix with two columns for x and y and NaN after each segment. One easy way to do this is as follows:</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">A =<span class="st"> </span>segments[,<span class="dv">1</span>:<span class="dv">4</span>]  <span class="co"># take only coordinates</span>
+A$n1 =<span class="st"> </span><span class="ot">NaN</span>          <span class="co"># add a NaN column</span>
+A$n2 =<span class="st"> </span><span class="ot">NaN</span>;
+A =<span class="st"> </span><span class="kw">t</span>(<span class="kw">matrix</span>(<span class="kw">as.vector</span>(<span class="kw">t</span>(A)),<span class="dt">nrow=</span><span class="dv">2</span>)) <span class="co"># Reshape it into suitable form</span>
+<span class="kw">plot</span>(A,<span class="dt">t=</span><span class="st">&quot;l&quot;</span>)
+<span class="kw">points</span>(A,<span class="dt">pty=</span><span class="dv">2</span>)</code></pre></div>
+<figure>
+<img src="figures/traclus-unnamed-chunk-5-1.png" alt="plot of chunk unnamed-chunk-5" /><figcaption>plot of chunk unnamed-chunk-5</figcaption>
+</figure>
+<p>This now shows all segments and puts points at segment start and end points. While this is interesting for debugging and understanding how TRACLUS works or some possibly unexpected results, we still want to find out the clustering, right?</p>
+<h2 id="showing-the-clustering-result">Showing the clustering result</h2>
+<p>Though we could write the following code snippet way smarter, in this way, I think, it is best to extend: There are explicit calls for every single trajectory given its cluster. So you can easily adapt this to situations, in which you want to work on the clustered trajectories instead of plotting them.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(plyr) <span class="co"># for efficient grouping using ddply</span>
+
+<span class="co"># plot the dataset into the background</span>
+<span class="kw">plot</span>(smallprague,<span class="dt">t=</span><span class="st">&quot;l&quot;</span>,<span class="dt">col=</span><span class="st">&quot;gray&quot;</span>)
+
+<span class="co"># not actually elegant, but very clear for beginners:</span>
+cluster_to_color &lt;-<span class="st"> </span>function(r)
+{
+   if (r ==<span class="st"> </span>-<span class="dv">2</span>){
+      <span class="kw">return</span> (<span class="st">&quot;red&quot;</span>);
+   }
+   if (r ==<span class="st"> </span>-<span class="dv">1</span>){
+       <span class="kw">return</span>(<span class="st">&quot;black&quot;</span>);
+   }
+   if (r ==<span class="st"> </span><span class="dv">0</span>){
+       <span class="kw">return</span> (<span class="st">&quot;yellow&quot;</span>);
+   }
+   if(r ==<span class="st"> </span><span class="dv">1</span>){
+      <span class="kw">return</span> (<span class="st">&quot;green&quot;</span>);
+   }
+}
+<span class="co"># Group by cluster and draw color</span>
+
+<span class="kw">ddply</span>(segments,.(cluster),function(x){
+   <span class="kw">points</span>(<span class="kw">c</span>(x$x1,x$x2),<span class="kw">c</span>(x$y1,x$y2),<span class="dt">col=</span><span class="kw">cluster_to_color</span>(x$cluster[<span class="dv">1</span>]));
+})</code></pre></div>
+<figure>
+<img src="figures/traclus-unnamed-chunk-6-1.png" alt="Figure: Clustering given by coloring points of segments." /><figcaption>Figure: Clustering given by coloring points of segments.</figcaption>
+</figure>
+<pre><code>## Dataframe mit 0 Spalten und 0 Zeilen</code></pre>
+<p>You can see all two clusters (0 and 1) in green and yellow, there is no noise, but a cluster of segments where the segments don't come from enoguh different trajectories (shown in Red).</p>
+<h1 id="other-parameters.">Other parameters.</h1>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">segments =<span class="st"> </span><span class="kw">traclus</span>(smallprague, <span class="dv">5</span>,<span class="dv">1</span>)</code></pre></div>
+<pre><code>## Have 24 trajectories</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">plot</span>(smallprague,<span class="dt">t=</span><span class="st">&quot;l&quot;</span>,<span class="dt">col=</span><span class="st">&quot;gray&quot;</span>)
+<span class="kw">ddply</span>(segments,.(cluster),function(x){
+   <span class="kw">points</span>(<span class="kw">c</span>(x$x1,x$x2),<span class="kw">c</span>(x$y1,x$y2),<span class="dt">col=</span><span class="kw">cluster_to_color</span>(x$cluster[<span class="dv">1</span>]));
+})</code></pre></div>
+<figure>
+<img src="figures/traclus-unnamed-chunk-7-1.png" alt="Figure: Traclus with a too small epsilon: Upper cluster works, but lower gets noise" /><figcaption>Figure: Traclus with a too small epsilon: Upper cluster works, but lower gets noise</figcaption>
+</figure>
+<pre><code>## Dataframe mit 0 Spalten und 0 Zeilen</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">segments =<span class="st"> </span><span class="kw">traclus</span>(smallprague, <span class="dv">2500</span>,<span class="dv">1</span>)</code></pre></div>
+<pre><code>## Have 24 trajectories</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">plot</span>(smallprague,<span class="dt">t=</span><span class="st">&quot;l&quot;</span>,<span class="dt">col=</span><span class="st">&quot;gray&quot;</span>)
+<span class="kw">ddply</span>(segments,.(cluster),function(x){
+   <span class="kw">points</span>(<span class="kw">c</span>(x$x1,x$x2),<span class="kw">c</span>(x$y1,x$y2),<span class="dt">col=</span><span class="kw">cluster_to_color</span>(x$cluster[<span class="dv">1</span>]));
+})</code></pre></div>
+<figure>
+<img src="figures/traclus-unnamed-chunk-8-1.png" alt="Figure: Traclus with a too large epsilon: A sinlge cluster..." /><figcaption>Figure: Traclus with a too large epsilon: A sinlge cluster...</figcaption>
+</figure>
+<pre><code>## Dataframe mit 0 Spalten und 0 Zeilen</code></pre>
+<h1 id="caveats">Caveats</h1>
+<p>Be careful with the current version, as it cannot yet handle interrupts. Often, the segmentation process will generate hundreds of thousands of segments (one weakness of the original segmentation proposed in the TRACLUS paper) and grouping them with DBSCAN becomes prohibitively slow. So keep a small dataset and possibly preprocess with Douglas Peucker and be prepared to kill your R process from time to time (Best practice on Linux: CTRL-Z to get it into the background, kill %1 to kill it, and fg to remove it from the background jobs)</p>
+</body>
+</html>

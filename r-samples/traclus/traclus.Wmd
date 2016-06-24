@@ -1,0 +1,134 @@
+# Trajectory Clustering
+
+Trajectory Clustering aims to group spatial trajectories into clusters. The
+TRACLUS framework has been defined which first splits trajectories into
+line segments, then groups these with a variant of DBSCAN. Finally, these
+trajectory segments are cleaned up for clusters which come from too few
+*different* source trajectories.
+
+
+## Running Traclus
+
+First, we will have to load the trajcomp R package. From this
+package, we load a small dataset (smallprague) taken from a computer game.
+
+```{r}
+library(trajcomp)
+data(smallprague)
+```
+Now let us first have a look at this dataset. It contains two clear clusters
+of trajectories and is not too large for the original TRACLUS algorithm:
+```f Plot of the complete dataset 
+plot(smallprague,t="l");
+``` 
+
+This dataset shall now be clustered using our TRACLUS algorithm implementation
+using a threshold of 25 and a number of lines 5.
+
+```{r}
+segments = traclus(smallprague, 25,5)
+```
+This now has segmented the trajectories in TRACLUS and clustered them 
+according to their total distance as described in the TRACLUS paper.
+Let us look at the result:
+
+```{r}
+head(segments)
+```
+We are given all segments (this is important when you want to debug your
+segmentation) together with the *zero-based* trajectory index, they came from
+and a cluster id.
+
+The non-negative cluster id's are actual clusters, a cluster id of -1 denotes
+noise and a cluster id of -2 denotes clusters of segments such that the segments
+are more than minLines, but those segments don't come from minLines *different*
+trajectories.
+
+## Using the results
+
+First of all, let us look at all of those segments. This is a bit tricky,
+as segments are stored in four columns giving x/y coordinates of start and
+end point. It is best to transform this into a matrix with two columns for
+x and y and NaN after each segment. One easy way to do this is as follows:
+
+```{r}
+A = segments[,1:4] 	# take only coordinates
+A$n1 = NaN 			# add a NaN column
+A$n2 = NaN;
+A = t(matrix(as.vector(t(A)),nrow=2)) # Reshape it into suitable form
+plot(A,t="l")
+points(A,pty=2)
+```
+
+This now shows all segments and puts points at segment start and end points.
+While this is interesting for debugging and understanding how TRACLUS works
+or some possibly unexpected results, we still want to find out the clustering, 
+right?
+
+## Showing the clustering result
+
+Though we could write the following code snippet way smarter, in this
+way, I think, it is best to extend: There are explicit calls for
+every single trajectory given its cluster.  So you can easily adapt this
+to situations, in which you want to work on the clustered trajectories instead
+of plotting them.
+
+```f Clustering given by coloring points of segments.
+library(plyr) # for efficient grouping using ddply
+
+# plot the dataset into the background
+plot(smallprague,t="l",col="gray")
+
+# not actually elegant, but very clear for beginners:
+cluster_to_color <- function(r)
+{
+   if (r == -2){
+      return ("red");
+   }
+   if (r == -1){
+       return("black");
+   }
+   if (r == 0){
+       return ("yellow");
+   }
+   if(r == 1){
+      return ("green");
+   }
+}
+# Group by cluster and draw color
+
+ddply(segments,.(cluster),function(x){
+   points(c(x$x1,x$x2),c(x$y1,x$y2),col=cluster_to_color(x$cluster[1]));
+})
+```
+
+You can see all two clusters (0 and 1) in green and yellow, there is no noise,
+but a cluster of segments where the segments don't come from enoguh different
+trajectories (shown in Red).
+
+# Other parameters.
+
+```f Traclus with a too small epsilon: Upper cluster works, but lower gets noise
+segments = traclus(smallprague, 5,1)
+plot(smallprague,t="l",col="gray")
+ddply(segments,.(cluster),function(x){
+   points(c(x$x1,x$x2),c(x$y1,x$y2),col=cluster_to_color(x$cluster[1]));
+})
+```
+
+
+```f Traclus with a too large epsilon: A sinlge cluster...
+segments = traclus(smallprague, 2500,1)
+plot(smallprague,t="l",col="gray")
+ddply(segments,.(cluster),function(x){
+   points(c(x$x1,x$x2),c(x$y1,x$y2),col=cluster_to_color(x$cluster[1]));
+})
+```
+# Caveats
+
+Be careful with the current version, as it cannot yet handle interrupts. Often,
+the segmentation process will generate hundreds of thousands of segments (one weakness of
+the original segmentation proposed in the TRACLUS paper) and grouping them with DBSCAN
+becomes prohibitively slow. So keep a small dataset and possibly preprocess with Douglas Peucker
+and be prepared to kill your R process from time to time (Best practice on Linux: CTRL-Z to get
+it into the background, kill %1 to kill it, and fg to remove it from the background jobs)
