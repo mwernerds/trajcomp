@@ -9,7 +9,7 @@ Description: Provides libTrajcomp C++ algorithms for R
 License: GPL (>= 2)
 Imports:
     Rcpp (>= 0.12.2)
-LinkingTo: Rcpp, BH, RcppEigen
+LinkingTo: Rcpp, BH, RcppEigen, RcppProgress
 SystemRequirements: C++11
 NeedsCompilation: yes
 Packaged: 2016-05-10 12:34:01 UTC; martin

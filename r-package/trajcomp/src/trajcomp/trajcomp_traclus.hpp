@@ -10,7 +10,8 @@
 #define NOISE -2
 #define REMOVED -3
 
-
+namespace trajcomp{
+	
 template<typename point>
 class tLineSegment
 {
@@ -25,7 +26,7 @@ class tLineSegment
 	{
 	}
 	
-	friend ostream& operator<<(ostream& os, const tLineSegment<point>& dt)
+	friend std::ostream& operator<<(std::ostream& os, const tLineSegment<point>& dt)
 	{
 		os << trajcomp::tools::make_string(dt.s) << " " << trajcomp::tools::make_string(dt.e) << " " << dt.trajectory_index << " " << dt.cluster;
 		return os;
@@ -296,13 +297,16 @@ segmentcollection compute_Ne(segmentcollection &D,
  * */
  //std::vector<tLineSegment<point>> &L,size_t i, size_t j
  
-template<typename point, typename distance_functor>
+template<typename point, typename distance_functor,typename progress_visitor>
 std::vector<size_t> compute_NeIndizes(std::vector<tLineSegment<point>> &L,size_t idx,
-		double eps, distance_functor &_d)
+		double eps, distance_functor &_d, progress_visitor pvis)
 {
 	std::vector<size_t> ret;
 	#pragma omp parallel for
 	for (size_t i=0; i < L.size(); i++)
+	{
+		#pragma omp critical
+		pvis(0,0,"Phase 2: Expanding a single cluster");
 	  if (idx != i)
 //		if (_d(L[i].s,L[i].e,L[idx].s,L[idx].e,i*L.size() + idx) <= eps)
 		if (_d(L,i,idx) <= eps)
@@ -310,7 +314,7 @@ std::vector<size_t> compute_NeIndizes(std::vector<tLineSegment<point>> &L,size_t
 		  #pragma omp critical
 	      ret.push_back(i);
 	    }
-	
+	}
 	return ret;	
 }
 /**
@@ -321,15 +325,16 @@ std::vector<size_t> compute_NeIndizes(std::vector<tLineSegment<point>> &L,size_t
  * 
  */
 
-template<typename point,typename distance_functor>
+template<typename point,typename distance_functor, typename visitor>
 void expandCluster(std::vector<tLineSegment<point>> &L,
 				   std::queue<size_t> &Q,
-					double eps,	size_t minLines, size_t clusterID,distance_functor &_d)
+					double eps,	size_t minLines, size_t clusterID,distance_functor &_d, visitor &pvis)
 {
      while (!Q.empty())
      {
+		 pvis(0,0,"Phase 2: Ticking Q");
 		  size_t m = Q.front();
-		 auto Ne = compute_NeIndizes(L,m,eps,_d);
+		 auto Ne = compute_NeIndizes(L,m,eps,_d, pvis);
 		 Ne.push_back(m);		 		 
 		 if (Ne.size() >= minLines)
 		 {
@@ -370,11 +375,11 @@ void grouping(std::vector<tLineSegment<point>> &L, double eps, size_t minLines,
 	pvis.init(L.size());
 	for (size_t i=0; i < L.size(); i++)
 	{
-		if (i%100==0)
+		
 		pvis(i,L.size(),"Phase 2: Clustering Segments");
 		if (L[i].cluster == UNCLASSIFIED)
 		{
-			std::vector<size_t> Ne = compute_NeIndizes<point>(L,i,eps,_d);
+			std::vector<size_t> Ne = compute_NeIndizes<point>(L,i,eps,_d,pvis);
 			//cout << "Ne[" << i << "]="<< Ne.size() << endl;
 			
 			if (Ne.size()+1 >= minLines)
@@ -385,7 +390,7 @@ void grouping(std::vector<tLineSegment<point>> &L, double eps, size_t minLines,
 					L[*it].cluster = clusterID;
 					Q.push(*it);
 				}
-				expandCluster(L,Q, eps,minLines,clusterID,_d);
+				expandCluster(L,Q, eps,minLines,clusterID,_d,pvis);
 				clusterID++;
 			}else  // not minLines
 			{
@@ -491,6 +496,6 @@ distance_functional &_d)
 
 
 
-
+}//namespace
 
 #endif

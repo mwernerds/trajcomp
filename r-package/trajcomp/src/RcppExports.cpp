@@ -104,6 +104,19 @@ BEGIN_RCPP
     return __result;
 END_RCPP
 }
+// cpp_traclus
+DataFrame cpp_traclus(NumericMatrix TrajectoryDB, double eps, int minLines);
+RcppExport SEXP trajcomp_cpp_traclus(SEXP TrajectoryDBSEXP, SEXP epsSEXP, SEXP minLinesSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject __result;
+    Rcpp::RNGScope __rngScope;
+    Rcpp::traits::input_parameter< NumericMatrix >::type TrajectoryDB(TrajectoryDBSEXP);
+    Rcpp::traits::input_parameter< double >::type eps(epsSEXP);
+    Rcpp::traits::input_parameter< int >::type minLines(minLinesSEXP);
+    __result = Rcpp::wrap(cpp_traclus(TrajectoryDB, eps, minLines));
+    return __result;
+END_RCPP
+}
 // redSVD
 List redSVD(SEXP AA, int num);
 RcppExport SEXP trajcomp_redSVD(SEXP AASEXP, SEXP numSEXP) {
