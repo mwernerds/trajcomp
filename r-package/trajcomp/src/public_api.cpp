@@ -14,6 +14,9 @@ using namespace Rcpp;
 // for windows (c++0x instead of c++11)
 #define TRAJCOMP_DISABLE_CPPCHECK
 
+
+#define TRAJCOMP_DOUGLAS_PEUCKER_TRACK_CONTRIBUTIONS
+
 #include<trajcomp/trajcomp.hpp>
 #include<trajcomp/trajcomp_traclus.hpp>
 #include"edit_distance.hpp"
@@ -670,6 +673,35 @@ NumericMatrix DouglasPeucker(NumericMatrix S, double epsilon) {
   return resultMatrix;
   
 }
+
+
+// [[Rcpp::export]]
+NumericMatrix DouglasPeuckerWeights(NumericMatrix S, double epsilon) {
+  
+
+  std::vector<std::vector<double>> trajectory;
+
+  
+  for (size_t i=0; i < S.nrow(); i++)		//@todo: remove copy by an adapter class @Martin
+    trajectory.push_back({S(i,0),S(i,1)});
+  
+  
+  std::vector<double> res = trajcomp::douglas_peucker_weights(trajectory, epsilon);
+  
+  
+  NumericMatrix resultMatrix = NumericMatrix(res.size(), 1) ;
+  for(int i = 0; i < res.size(); i++){
+    NumericVector temp = wrap(res[i]); 
+    resultMatrix(i,_) = temp;
+  }
+
+//   std::cout << res[res.size()-1][0] << ", " << res[res.size()-1][1] << std::endl;
+  
+    
+  return resultMatrix;
+  
+}
+
 
 
 /*

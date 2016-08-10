@@ -38,6 +38,10 @@ DouglasPeucker <- function(S, epsilon) {
     .Call('trajcomp_DouglasPeucker', PACKAGE = 'trajcomp', S, epsilon)
 }
 
+DouglasPeuckerWeights <- function(S, epsilon) {
+    .Call('trajcomp_DouglasPeuckerWeights', PACKAGE = 'trajcomp', S, epsilon)
+}
+
 doPLI <- function(data, n) {
     .Call('trajcomp_doPLI', PACKAGE = 'trajcomp', data, n)
 }

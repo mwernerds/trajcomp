@@ -381,6 +381,7 @@ class douglas_peucker_impl
 {
 	public:
 	std::vector<unsigned char> booleanMap; // @REMARK: could also use bool specialization
+	std::vector<DistanceType> numericMap;  // @REMARK: could be split away if picky about the memory
 	element_segment_distance<typename TrajectoryType::value_type, DistanceType> *d;
 public:
    douglas_peucker_impl():d(NULL){};
@@ -427,6 +428,10 @@ DistanceType largest_contribution(TrajectoryType &u, size_t istart, size_t iend,
 #ifdef DEBUG_douglas_peucker_simplify
 		   std::cout << "DP: Insert " << the_index << std::endl;
 #endif
+#ifdef TRAJCOMP_DOUGLAS_PEUCKER_TRACK_CONTRIBUTIONS
+           numericMap[the_index] = the_contribution;
+#endif
+
 		   booleanMap[the_index] = 1;
 		   simplify(u,istart,the_index,max_error);
 		   simplify(u,the_index,iend,max_error);
@@ -456,7 +461,7 @@ DistanceType largest_contribution(TrajectoryType &u, size_t istart, size_t iend,
 	for (size_t i=0; i < u.size(); i++)
 		booleanMap[i] = 0;
 	booleanMap[0] = booleanMap[u.size()-1] = 1;
-  
+    numericMap.resize(u.size());
 	simplify(u,0,u.size()-1,max_error);
 	//@TODO: call indizes for above.
 	// now build the simplified trajectory
@@ -467,6 +472,25 @@ DistanceType largest_contribution(TrajectoryType &u, size_t istart, size_t iend,
 	     
 	 return ret;
 
+  }
+  
+  
+  std::vector<DistanceType> weights(TrajectoryType u, DistanceType max_error,
+            element_segment_distance<typename TrajectoryType::value_type,DistanceType> &d)
+  {
+	this->d = &d;
+    
+	booleanMap.resize(u.size());
+	numericMap.resize(u.size());
+	for (size_t i=0; i < u.size(); i++)
+	{
+		booleanMap[i] = 0;
+		numericMap[i] = 0;
+	}
+	booleanMap[0] = booleanMap[u.size()-1] = 1;
+  
+	simplify(u,0,u.size()-1,max_error);
+	return numericMap;
   }
   
 };
@@ -502,6 +526,15 @@ std::vector<size_t> douglas_peucker_indizes(TrajectoryType &t, double epsilon)
 	return ret;
 }	
 
+
+template<class TrajectoryType>
+std::vector<double> douglas_peucker_weights(TrajectoryType &t, double epsilon)
+{
+	douglas_peucker_impl<TrajectoryType, double> dp;
+	default_segment_distance<typename TrajectoryType::value_type> d;
+	
+	return dp.weights(t,epsilon,d);
+}	
 
 
 //3.2.3. Bellmans Algorithm.

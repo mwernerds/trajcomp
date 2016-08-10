@@ -92,6 +92,18 @@ BEGIN_RCPP
     return __result;
 END_RCPP
 }
+// DouglasPeuckerWeights
+NumericMatrix DouglasPeuckerWeights(NumericMatrix S, double epsilon);
+RcppExport SEXP trajcomp_DouglasPeuckerWeights(SEXP SSEXP, SEXP epsilonSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject __result;
+    Rcpp::RNGScope __rngScope;
+    Rcpp::traits::input_parameter< NumericMatrix >::type S(SSEXP);
+    Rcpp::traits::input_parameter< double >::type epsilon(epsilonSEXP);
+    __result = Rcpp::wrap(DouglasPeuckerWeights(S, epsilon));
+    return __result;
+END_RCPP
+}
 // doPLI
 NumericMatrix doPLI(NumericMatrix data, int n);
 RcppExport SEXP trajcomp_doPLI(SEXP dataSEXP, SEXP nSEXP) {
