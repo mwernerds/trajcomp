@@ -476,70 +476,65 @@ SEXP trajectory_distances(NumericMatrix S, NumericMatrix T, int hSetting)
 }
 
 
-// /*
-//  * Martin
-//  * 
-//  * 
-//  * */
-// // [[Rcpp::export]]
-// NumericVector trajectory_distance_vector(NumericMatrix S, NumericMatrix T, int hSetting)
-// {
-//   
-//   Settings s = getSettings(hSetting);
-//   
-//   if (s.distances.size() != 1)
-//     throw(std::runtime_error("trajectory_distance_vector can only use one distance at a time"));
-//   
-//   std::vector<std::vector<double>> trajectory,query;
-//   
-//   for (size_t i=0; i < T.nrow(); i++)		//@todo: remove copy by an adapter class @Martin
-//     query.push_back({T(i,0),T(i,1)});
-//   
-//   std::vector<double> distances(S.nrow());
-//   std::vector<size_t> distributor;
-//   
-//   for (size_t i=0; i <= S.nrow(); i++)		
-//   {
-//     if (i == S.nrow()|| std::isnan(S(i,0))) // the last or any nan
-//     {
-//       //work (else collect)
-//       // for each distance... it is only one ;-)
-//       double d;
-//       for(int i = 0; i < s.distances.size(); i++){
-//         
-//         // if there are no features to encode, dispatch by distance name
-//         if(s.lengths[i] == 0){
-//           d = 
-//             distance_dispatchbyname(
-//               trajectory, query, s.distances[i]);
-//           
-//           
-//           
-//         }
-//         else{
-//           std::vector<std::string> featureNames;
-//           // encode trajectory according to requested feature(s)
-//           d = string_distance_dispatchbyname(
-//             zip_features(trajectory, s.features[i]),
-//             zip_features(query, s.features[i]),
-//             s.distances[i], s.lengths[i]);
-//         }
-//       }  
-//       if (i < distances.size()) distances[i] = S(i,0); // make it NaN
-//       for (auto p:distributor) distances[p] = d;
-//       
-//       trajectory.clear();
-//       distributor.clear();
-//       
-//     }else{ // collect!
-//       trajectory.push_back({S(i,0),S(i,1)});
-//       distributor.push_back(i);
-//     } 
-//     
-//   } // foreach trajectory
-//   
-//   return wrap (distances);
-// }
+// [[Rcpp::export]]
+ NumericVector trajectory_distance_vector(NumericMatrix S, NumericMatrix T, int hSetting)
+ {
+   
+   Settings s = getSettings(hSetting);
+   
+   if (s.distances.size() != 1)
+     throw(std::runtime_error("trajectory_distance_vector can only use one distance at a time"));
+   
+   std::vector<std::vector<double>> trajectory,query;
+   
+   for (size_t i=0; i < T.nrow(); i++)		//@todo: remove copy by an adapter class @Martin
+    query.push_back({T(i,0),T(i,1)});
+   
+   std::vector<double> distances(S.nrow());
+   std::vector<size_t> distributor;
+   
+   for (size_t i=0; i <= S.nrow(); i++)		
+  {
+     if (i == S.nrow()|| std::isnan(S(i,0))) // the last or any nan
+    {
+       //work (else collect)
+       // for each distance... it is only one ;-)
+       double d;
+       for(int i = 0; i < s.distances.size(); i++){
+         
+         // if there are no features to encode, dispatch by distance name
+         if(s.lengths[i] == 0){
+           d = 
+             distance_dispatchbyname(
+               trajectory, query, s.distances[i]);
+           
+           
+           
+         }
+        else{
+           std::vector<std::string> featureNames;
+           // encode trajectory according to requested feature(s)
+           d = string_distance_dispatchbyname(
+             zip_features(trajectory, s.features[i]),
+             zip_features(query, s.features[i]),
+             s.distances[i], s.lengths[i]);
+         }
+       }  
+       if (i < distances.size()) distances[i] = S(i,0); // make it NaN
+       for (auto p:distributor) distances[p] = d;
+       
+      trajectory.clear();
+       distributor.clear();
+       
+     }else{ // collect!
+       trajectory.push_back({S(i,0),S(i,1)});
+       distributor.push_back(i);
+     } 
+     
+   } // foreach trajectory
+   
+   return wrap (distances);
+ }
 
 // [[Rcpp::export]]
 String encode(NumericMatrix T, std::string feature){

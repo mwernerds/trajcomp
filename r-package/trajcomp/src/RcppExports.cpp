@@ -44,6 +44,19 @@ BEGIN_RCPP
     return __result;
 END_RCPP
 }
+// trajectory_distance_vector
+NumericVector trajectory_distance_vector(NumericMatrix S, NumericMatrix T, int hSetting);
+RcppExport SEXP trajcomp_trajectory_distance_vector(SEXP SSEXP, SEXP TSEXP, SEXP hSettingSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject __result;
+    Rcpp::RNGScope __rngScope;
+    Rcpp::traits::input_parameter< NumericMatrix >::type S(SSEXP);
+    Rcpp::traits::input_parameter< NumericMatrix >::type T(TSEXP);
+    Rcpp::traits::input_parameter< int >::type hSetting(hSettingSEXP);
+    __result = Rcpp::wrap(trajectory_distance_vector(S, T, hSetting));
+    return __result;
+END_RCPP
+}
 // encode
 String encode(NumericMatrix T, std::string feature);
 RcppExport SEXP trajcomp_encode(SEXP TSEXP, SEXP featureSEXP) {

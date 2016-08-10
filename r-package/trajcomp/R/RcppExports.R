@@ -22,6 +22,10 @@ trajectory_distances <- function(S, T, hSetting) {
     .Call('trajcomp_trajectory_distances', PACKAGE = 'trajcomp', S, T, hSetting)
 }
 
+trajectory_distance_vector <- function(S, T, hSetting) {
+    .Call('trajcomp_trajectory_distance_vector', PACKAGE = 'trajcomp', S, T, hSetting)
+}
+
 encode <- function(T, feature) {
     .Call('trajcomp_encode', PACKAGE = 'trajcomp', T, feature)
 }
