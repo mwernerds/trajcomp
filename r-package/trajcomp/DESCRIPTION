@@ -3,7 +3,7 @@ Type: Package
 Title: Trajectory Computing Algorithms
 Version: 0.2
 Date: 2016-05-09
-Author: Martin Werner, Marie Kiermeier
+Author: Martin Werner, Marie Kiermeier, Moritz Laass
 Maintainer: Martin Werner <martin.werner@ifi.lmu.de>
 Description: Provides libTrajcomp C++ algorithms for R
 License: GPL (>= 2)
@@ -14,3 +14,6 @@ SystemRequirements: C++11
 NeedsCompilation: yes
 Packaged: 2016-05-10 12:34:01 UTC; martin
 RoxygenNote: 5.0.1
+Suggests: knitr,
+    rmarkdown
+VignetteBuilder: knitr

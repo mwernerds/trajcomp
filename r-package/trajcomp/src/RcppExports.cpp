@@ -6,6 +6,68 @@
 
 using namespace Rcpp;
 
+// persistence_curve
+NumericVector persistence_curve(NumericMatrix T);
+RcppExport SEXP trajcomp_persistence_curve(SEXP TSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject __result;
+    Rcpp::RNGScope __rngScope;
+    Rcpp::traits::input_parameter< NumericMatrix >::type T(TSEXP);
+    __result = Rcpp::wrap(persistence_curve(T));
+    return __result;
+END_RCPP
+}
+// persistence_bars
+NumericVector persistence_bars(NumericMatrix T, NumericVector it);
+RcppExport SEXP trajcomp_persistence_bars(SEXP TSEXP, SEXP itSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject __result;
+    Rcpp::RNGScope __rngScope;
+    Rcpp::traits::input_parameter< NumericMatrix >::type T(TSEXP);
+    Rcpp::traits::input_parameter< NumericVector >::type it(itSEXP);
+    __result = Rcpp::wrap(persistence_bars(T, it));
+    return __result;
+END_RCPP
+}
+// persistence_bars_pruned
+NumericVector persistence_bars_pruned(NumericMatrix T, NumericVector Beta, NumericVector it);
+RcppExport SEXP trajcomp_persistence_bars_pruned(SEXP TSEXP, SEXP BetaSEXP, SEXP itSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject __result;
+    Rcpp::RNGScope __rngScope;
+    Rcpp::traits::input_parameter< NumericMatrix >::type T(TSEXP);
+    Rcpp::traits::input_parameter< NumericVector >::type Beta(BetaSEXP);
+    Rcpp::traits::input_parameter< NumericVector >::type it(itSEXP);
+    __result = Rcpp::wrap(persistence_bars_pruned(T, Beta, it));
+    return __result;
+END_RCPP
+}
+// persistence_comps
+NumericVector persistence_comps(NumericVector T, NumericVector Beta, NumericVector it);
+RcppExport SEXP trajcomp_persistence_comps(SEXP TSEXP, SEXP BetaSEXP, SEXP itSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject __result;
+    Rcpp::RNGScope __rngScope;
+    Rcpp::traits::input_parameter< NumericVector >::type T(TSEXP);
+    Rcpp::traits::input_parameter< NumericVector >::type Beta(BetaSEXP);
+    Rcpp::traits::input_parameter< NumericVector >::type it(itSEXP);
+    __result = Rcpp::wrap(persistence_comps(T, Beta, it));
+    return __result;
+END_RCPP
+}
+// persistence_multires
+NumericVector persistence_multires(NumericMatrix T, NumericVector Beta, NumericVector Levels);
+RcppExport SEXP trajcomp_persistence_multires(SEXP TSEXP, SEXP BetaSEXP, SEXP LevelsSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject __result;
+    Rcpp::RNGScope __rngScope;
+    Rcpp::traits::input_parameter< NumericMatrix >::type T(TSEXP);
+    Rcpp::traits::input_parameter< NumericVector >::type Beta(BetaSEXP);
+    Rcpp::traits::input_parameter< NumericVector >::type Levels(LevelsSEXP);
+    __result = Rcpp::wrap(persistence_multires(T, Beta, Levels));
+    return __result;
+END_RCPP
+}
 // string_distance_dispatchbyname
 double string_distance_dispatchbyname(std::string t, std::string q, std::string name, int k);
 RcppExport SEXP trajcomp_string_distance_dispatchbyname(SEXP tSEXP, SEXP qSEXP, SEXP nameSEXP, SEXP kSEXP) {

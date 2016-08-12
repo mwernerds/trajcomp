@@ -30,6 +30,8 @@ namespace pt = boost::property_tree;
 
 #include "public_api.h"
 
+#include "persistence.hpp"
+
 
 
 std::vector<Settings> gSettings;
