@@ -52,10 +52,6 @@ namespace persistence{
     return length(diff(v,w));
   }
   
-  /*
-   * Returns a list of angles for each vertex start and end are always 0
-   */
-  
   struct CurveElement{
     double val;
     int index;
@@ -211,7 +207,9 @@ namespace persistence{
       
       //grow bars
       int i = iter%((int) active_comps.size());
-      std::cout<<"iter: "<<iter << " %% "<< i<<"/"<<active_comps.size() <<std::endl;
+      
+      //std::cout<<"iter: "<<iter << " %% "<< i<<"/"<<active_comps.size() <<std::endl;
+      
       auto current_i = active_comps[i];
       auto &c1 = comps[current_i];
       
@@ -229,7 +227,7 @@ namespace persistence{
           c1.max = c1.right;
         }
         
-        std::cout<<"Finished!!!!!!!!!!!!!!!! at: "<< iter<<std::endl;
+        //std::cout<<"Finished!!!!!!!!!!!!!!!! at: "<< iter<<std::endl;
       }
       
       if(!c1.finished){
@@ -380,7 +378,7 @@ NumericVector persistence_bars(NumericMatrix T, NumericVector it = -1) {
 }
 
 // [[Rcpp::export]]
-NumericVector persistence_bars_pruned(NumericMatrix T, NumericVector Beta = 0,  NumericVector it = -1) {
+NumericVector persistence_pruned(NumericMatrix T, NumericVector Beta = 0,  NumericVector it = -1) {
   persistence::Trajectory trajectory;
 
   for (size_t i=0; i < T.nrow(); i++)		//@todo: remove copy by an adapter class @Martin
@@ -424,18 +422,51 @@ NumericVector persistence_multires(NumericMatrix T, NumericVector Beta = 0, Nume
     trajectory.push_back({T(i,0),T(i,1)});
 
   auto curve = persistence::traj_to_curve(trajectory);
-  //auto p_result = persistence::persistenceMultiRes(curve, Beta(0), Levels(0));
+  auto p_result = persistence::persistenceMultiRes(curve, Beta(0), Levels(0));
 
   std::vector<int> res;
-  // for(auto r : p_result.pruned){
-  //   res.push_back( r.index);
-  // }
-
-  for(auto r : curve){
-     res.push_back( r.index  );
+  for(auto r : p_result){
+    res.push_back( r.index);
   }
 
   return wrap(res);
 }
 
 
+
+// [[Rcpp::export]]
+NumericVector persistence_test_bars(NumericVector T, NumericVector Beta = 0, NumericVector it = -1) {
+  persistence::Curve curve;
+  
+  for (size_t i=0; i < T.size(); i++)		//@todo: remove copy by an adapter class @Martin
+    curve.push_back({T[i], 0, {0,0}});
+  
+  auto p_result = persistence::PersistenceAlg(curve, Beta(0), it(0));
+  
+  std::vector<int> bars;
+  for(auto b : p_result.bars){
+    bars.push_back( b.min);
+    bars.push_back( b.max);
+  }
+  
+  return wrap(bars);
+}
+
+// [[Rcpp::export]]
+NumericVector persistence_test_comps(NumericVector T, NumericVector Beta = 0,  NumericVector it = -1) {
+  persistence::Curve curve;
+  
+  for (size_t i=0; i < T.size(); i++)		//@todo: remove copy by an adapter class @Martin
+    curve.push_back({T[i], 0, {0,0}});
+  
+  auto p_result = persistence::PersistenceAlg(curve, Beta(0), it(0));
+  
+  std::vector<int> comps;
+  for(auto b : p_result.comps){
+    comps.push_back( b.left);
+    comps.push_back( b.min);
+    comps.push_back( b.right);
+  }
+  
+  return wrap(comps);
+}

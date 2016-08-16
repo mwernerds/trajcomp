@@ -1,5 +1,5 @@
 ---
-title: "Persistence based trajectory segmentation"
+title: "Persistence based trajectory simplification"
 author: "Moritz Laass"
 date: "`r Sys.Date()`"
 output: rmarkdown::html_vignette
@@ -8,52 +8,326 @@ vignette: >
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
+Persistence based trajectory simplification is an algorithm that can be used to replace Douglas-Peucker for segmentation or simplification of trajectories. The main advantage of the algorithm is the complexity of `O(n)` compared to Douglas-Peucker's complexity of `O(n^2)`.
 
-Vignettes are long form documentation commonly included in packages. Because they are part of the distribution of the package, they need to be as compact as possible. The `html_vignette` output type provides a custom style sheet (and tweaks some options) to ensure that the resulting html is as small as possible. The `html_vignette` format:
+This package provides a few flavors of the the algorithm which shall be explored in the following sections, aswell as giving an understanding of the algorithms inner workings which will be usefull when deciding on the values to use for simplification or segmentation.
 
-- Never uses retina figures
-- Has a smaller default figure size
-- Uses a custom CSS stylesheet instead of the default Twitter Bootstrap style
 
-## Vignette Info
+#Converting trajecories to curves
+The persistence algorithm works on a curve that is derived from the discrete curvature in each point.
+The package provides the function `persistence_curve` which converts a trajectory to a list of curvature values in degrees. It can be helpful to look at this curve if you are deciding on a value for `Beta` when using Beta-Pruning.
 
-Note the various macros within the `vignette` section of the metadata block above. These are required in order to instruct R how to build the vignette. Note that you should change the `title` field and the `\VignetteIndexEntry` to match the title of your vignette.
+```{r, echo=FALSE}
+library(trajcomp)
+data(prague)
 
-## Styles
+#get trajectory
+prague$tid = getTrajectoryIDs(prague); # Add ID column
+# and split on it
+psplit = split (prague, f = prague$tid);
+traj <- psplit[[1]];
 
-The `html_vignette` template includes a basic CSS theme. To override this theme you can specify your own CSS in the document metadata as follows:
+#trajectory plot
+plot(traj$x, traj$y, col="orange",
+  main="Trajectory",
+  xlab="x-axis",
+  ylab="y-axis")
+lines(traj$x, traj$y, col="black")
 
-    output: 
-      rmarkdown::html_vignette:
-        css: mystyles.css
-
-## Figures
-
-The figure sizes have been customised so that you can easily put two images side-by-side. 
-
-```{r, fig.show='hold'}
-plot(1:10)
-plot(10:1)
+#curve plot
+curve <- persistence_curve(as.matrix(traj))
+plot(curve,  col="orange",
+  main="Curve from Trajectory",
+  xlab="Index",
+  ylab="Curvature (Degrees)")
+lines(curve, col="black")
 ```
 
-You can enable figure captions by `fig_caption: yes` in YAML:
 
-    output:
-      rmarkdown::html_vignette:
-        fig_caption: yes
+The algorithm builds a connected component graph between the minima and maxima of the curve  which results in set of so called bars tha each connect a minima and a maxima.
 
-Then you can use the chunk option `fig.cap = "Your figure caption."` in **knitr**.
+By pruning the the bars, for which the difference between the minimum and the maximum is smaller than the pruning value `beta`, we get Beta-Pruning which will be discussed in the next section.
 
-## More Examples
 
-You can write math expressions, e.g. $Y = X\beta + \epsilon$, footnotes^[A footnote here.], and tables, e.g. using `knitr::kable()`.
+```{r, echo=FALSE}
+library(trajcomp)
+alpha  <- c(0, 9,0 ,-7,-2,-3,6, -2, 1,0)
 
-```{r, echo=FALSE, results='asis'}
-knitr::kable(head(mtcars, 10))
+plot(alpha, pch=1, col="orange", ylim = c(-7,22),
+  main="Original Curve",
+  xlab="Index",
+  ylab="Curvature (Degrees)")
+
+legend(1,25, c( "curve"), col = c("orange"), lty = c( 1), pch = c(1), bty="n")
+lines(alpha, col="orange")
+
+bars <- persistence_test_bars(alpha)
+bars_min <- bars[c(TRUE, FALSE)]
+bars_max <- bars[c(FALSE, TRUE)]
+
+# curve and bar plot
+plot(alpha, pch=1, col="orange", ylim = c(-7,22),
+main="Curve with bars",
+xlab="Index",
+ylab="Curvature (Degrees)")
+
+legend(5,25, c("bars", "curve"), col = c("blue", "orange"), lty = c(1, 1), pch = c(-1,1), bty="n")
+
+legend(1,25, c("min", "max"), col = c("green", "red"), lty = c(-1, -1), pch = c(1,1), bty="n")
+lines(alpha, col="orange")
+points(bars_min+1, alpha[bars_min+1], col="green", pch=1)
+points(bars_max+1, alpha[bars_max+1], col="red", pch=1)
+
+xLow <- bars_min+1
+yLow <- alpha[bars_min+1]
+xHigh <- bars_max+1
+yHigh <- alpha[bars_max+1]
+arrows(xHigh,yHigh,xLow,yLow,col="blue",angle=90,length=0.1,code=3)
+
 ```
 
-Also a quote using `>`:
 
-> "He who gives up [code] safety for [code] speed deserves neither."
-([via](https://twitter.com/hadleywickham/status/504368538874703872))
+#Persistence with Beta-Pruning
+Beta pruning removes all bars that fall below the threshhold of `beta`. For different types of trajectories different values of 'beta' yield better results. 
+
+Also it should be noted that Beta pruning simplifies the trajectory well if  changes of direction happen gradually, but does not deal well with noisy data.
+
+To deal with noise persistence with multiresolution simplification should be used, which will be discussed in the next section.
+
+```{r, echo=FALSE}
+library(trajcomp)
+data(prague)
+
+#get trajectory
+prague$tid = getTrajectoryIDs(prague); # Add ID column
+# and split on it
+psplit = split (prague, f = prague$tid);
+traj <- psplit[[1]];
+
+#trajectory plot
+plot(traj$x, traj$y, col="black", pch=21,
+  main="Original Trajectory",
+  xlab="x-axis",
+  ylab="y-axis")
+lines(traj$x, traj$y, col="orange")
+
+pruned <- persistence_pruned(as.matrix(traj), 0)
+#pruned trajectory plot
+plot(traj$x[pruned+1], traj$y[pruned+1], col="black", pch=21,
+  main="beta = 0",
+  xlab="x-axis",
+  ylab="y-axis")
+lines(traj$x[pruned+1], traj$y[pruned+1], col="green")
+
+pruned <- persistence_pruned(as.matrix(traj), 2)
+plot(traj$x[pruned+1], traj$y[pruned+1], col="black", pch=21,
+  main="beta = 2",
+  xlab="x-axis",
+  ylab="y-axis")
+lines(traj$x[pruned+1], traj$y[pruned+1], col="blue")
+
+pruned <- persistence_pruned(as.matrix(traj), 4)
+plot(traj$x[pruned+1], traj$y[pruned+1], col="black", pch=21,
+  main="beta = 4",
+  xlab="x-axis",
+  ylab="y-axis")
+lines(traj$x[pruned+1], traj$y[pruned+1], col="red")
+
+pruned <- persistence_pruned(as.matrix(traj), 8)
+plot(traj$x[pruned+1], traj$y[pruned+1], col="black", pch=21,
+  main="beta = 8",
+  xlab="x-axis",
+  ylab="y-axis")
+lines(traj$x[pruned+1], traj$y[pruned+1], col="orange")
+
+
+pruned <- persistence_pruned(as.matrix(traj), 16)
+plot(traj$x[pruned+1], traj$y[pruned+1], col="black", pch=21,
+  main="beta = 16",
+  xlab="x-axis",
+  ylab="y-axis")
+lines(traj$x[pruned+1], traj$y[pruned+1], col="purple")
+
+```
+
+#Persistence with Multi Resolution Simplification
+
+Multi resolution takes a second parameter, additional to `beta`, called `levels`. 
+Levels is an integer value that defines the number of iterations the trajectoriy goes through beta pruning and a noise reduction step which removes all vertices that are closer  to each other than '2^(iteration)' . That means for trajectories, that cover bigger distances larger values of `levels` should be used. 
+
+Also it is noteworthy to select both `beta` and `levels` accorinf to your data, to get ideal results.
+
+##Multiresolution Simplification with Beta = 2
+```{r, echo=FALSE}
+library(trajcomp)
+data(prague)
+
+#get trajectory
+prague$tid = getTrajectoryIDs(prague); # Add ID column
+# and split on it
+psplit = split (prague, f = prague$tid);
+traj <- psplit[[1]];
+
+
+#trajectory plot
+plot(traj$x, traj$y, col="black", pch=21,
+  main="original trajectory",
+  xlab="x-axis",
+  ylab="y-axis")
+lines(traj$x, traj$y, col="orange")
+
+
+pruned <- persistence_multires(as.matrix(traj), 2, 1)
+plot(traj$x[pruned+1], traj$y[pruned+1], col="black", pch=21,
+  main="beta = 2, levels = 1",
+  xlab="x-axis",
+  ylab="y-axis")
+lines(traj$x[pruned+1], traj$y[pruned+1], col="green")
+
+pruned <- persistence_multires(as.matrix(traj), 2, 2)
+plot(traj$x[pruned+1], traj$y[pruned+1], col="black", pch=21,
+  main="beta = 2, levels = 2",
+  xlab="x-axis",
+  ylab="y-axis")
+lines(traj$x[pruned+1], traj$y[pruned+1], col="blue")
+
+pruned <- persistence_multires(as.matrix(traj), 2, 3)
+plot(traj$x[pruned+1], traj$y[pruned+1], col="black", pch=21,
+  main="beta = 2, levels = 3",
+  xlab="x-axis",
+  ylab="y-axis")
+lines(traj$x[pruned+1], traj$y[pruned+1], col="red")
+
+pruned <- persistence_multires(as.matrix(traj), 2, 4)
+plot(traj$x[pruned+1], traj$y[pruned+1], col="black", pch=21,
+  main="beta = 2, levels = 4",
+  xlab="x-axis",
+  ylab="y-axis")
+lines(traj$x[pruned+1], traj$y[pruned+1], col="orange")
+
+pruned <- persistence_multires(as.matrix(traj), 2, 5)
+plot(traj$x[pruned+1], traj$y[pruned+1], col="black", pch=21,
+  main="beta = 2, levels = 5",
+  xlab="x-axis",
+  ylab="y-axis")
+lines(traj$x[pruned+1], traj$y[pruned+1], col="purple")
+
+```
+
+
+##Multiresolution Simplification with Beta = 4
+```{r, echo=FALSE}
+library(trajcomp)
+data(prague)
+
+#get trajectory
+prague$tid = getTrajectoryIDs(prague); # Add ID column
+# and split on it
+psplit = split (prague, f = prague$tid);
+traj <- psplit[[1]];
+
+
+#trajectory plot
+plot(traj$x, traj$y, col="black", pch=21,
+  main="original trajectory",
+  xlab="x-axis",
+  ylab="y-axis")
+lines(traj$x, traj$y, col="orange")
+
+
+pruned <- persistence_multires(as.matrix(traj), 4, 1)
+plot(traj$x[pruned+1], traj$y[pruned+1], col="black", pch=21,
+  main="beta = 4, levels = 1",
+  xlab="x-axis",
+  ylab="y-axis")
+lines(traj$x[pruned+1], traj$y[pruned+1], col="green")
+
+pruned <- persistence_multires(as.matrix(traj), 4, 2)
+plot(traj$x[pruned+1], traj$y[pruned+1], col="black", pch=21,
+  main="beta = 4, levels = 2",
+  xlab="x-axis",
+  ylab="y-axis")
+lines(traj$x[pruned+1], traj$y[pruned+1], col="blue")
+
+pruned <- persistence_multires(as.matrix(traj), 4, 3)
+plot(traj$x[pruned+1], traj$y[pruned+1], col="black", pch=21,
+  main="beta = 4, levels = 3",
+  xlab="x-axis",
+  ylab="y-axis")
+lines(traj$x[pruned+1], traj$y[pruned+1], col="red")
+
+pruned <- persistence_multires(as.matrix(traj), 4, 4)
+plot(traj$x[pruned+1], traj$y[pruned+1], col="black", pch=21,
+  main="beta = 4, levels = 4",
+  xlab="x-axis",
+  ylab="y-axis")
+lines(traj$x[pruned+1], traj$y[pruned+1], col="orange")
+
+pruned <- persistence_multires(as.matrix(traj), 4, 5)
+plot(traj$x[pruned+1], traj$y[pruned+1], col="black", pch=21,
+  main="beta = 4, levels = 5",
+  xlab="x-axis",
+  ylab="y-axis")
+lines(traj$x[pruned+1], traj$y[pruned+1], col="purple")
+
+```
+
+
+
+##Multiresolution Simplification with Beta = 8
+```{r, echo=FALSE}
+library(trajcomp)
+data(prague)
+
+#get trajectory
+prague$tid = getTrajectoryIDs(prague); # Add ID column
+# and split on it
+psplit = split (prague, f = prague$tid);
+traj <- psplit[[1]];
+
+
+#trajectory plot
+plot(traj$x, traj$y, col="black", pch=21,
+  main="original trajectory",
+  xlab="x-axis",
+  ylab="y-axis")
+lines(traj$x, traj$y, col="orange")
+
+
+pruned <- persistence_multires(as.matrix(traj), 8, 1)
+plot(traj$x[pruned+1], traj$y[pruned+1], col="black", pch=21,
+  main="beta = 8, levels = 1",
+  xlab="x-axis",
+  ylab="y-axis")
+lines(traj$x[pruned+1], traj$y[pruned+1], col="green")
+
+pruned <- persistence_multires(as.matrix(traj), 8, 2)
+plot(traj$x[pruned+1], traj$y[pruned+1], col="black", pch=21,
+  main="beta = 8, levels = 2",
+  xlab="x-axis",
+  ylab="y-axis")
+lines(traj$x[pruned+1], traj$y[pruned+1], col="blue")
+
+pruned <- persistence_multires(as.matrix(traj), 8, 3)
+plot(traj$x[pruned+1], traj$y[pruned+1], col="black", pch=21,
+  main="beta = 8, levels = 3",
+  xlab="x-axis",
+  ylab="y-axis")
+lines(traj$x[pruned+1], traj$y[pruned+1], col="red")
+
+pruned <- persistence_multires(as.matrix(traj), 8, 4)
+plot(traj$x[pruned+1], traj$y[pruned+1], col="black", pch=21,
+  main="beta = 8, levels = 4",
+  xlab="x-axis",
+  ylab="y-axis")
+lines(traj$x[pruned+1], traj$y[pruned+1], col="orange")
+
+pruned <- persistence_multires(as.matrix(traj), 8, 5)
+plot(traj$x[pruned+1], traj$y[pruned+1], col="black", pch=21,
+  main="beta = 8, levels = 5",
+  xlab="x-axis",
+  ylab="y-axis")
+lines(traj$x[pruned+1], traj$y[pruned+1], col="purple")
+
+```
 

@@ -9,8 +9,8 @@ persistence_bars <- function(T, it = -1L) {
     .Call('trajcomp_persistence_bars', PACKAGE = 'trajcomp', T, it)
 }
 
-persistence_bars_pruned <- function(T, Beta = 0L, it = -1L) {
-    .Call('trajcomp_persistence_bars_pruned', PACKAGE = 'trajcomp', T, Beta, it)
+persistence_pruned <- function(T, Beta = 0L, it = -1L) {
+    .Call('trajcomp_persistence_pruned', PACKAGE = 'trajcomp', T, Beta, it)
 }
 
 persistence_comps <- function(T, Beta = 0L, it = -1L) {
@@ -19,6 +19,14 @@ persistence_comps <- function(T, Beta = 0L, it = -1L) {
 
 persistence_multires <- function(T, Beta = 0L, Levels = 5L) {
     .Call('trajcomp_persistence_multires', PACKAGE = 'trajcomp', T, Beta, Levels)
+}
+
+persistence_test_bars <- function(T, Beta = 0L, it = -1L) {
+    .Call('trajcomp_persistence_test_bars', PACKAGE = 'trajcomp', T, Beta, it)
+}
+
+persistence_test_comps <- function(T, Beta = 0L, it = -1L) {
+    .Call('trajcomp_persistence_test_comps', PACKAGE = 'trajcomp', T, Beta, it)
 }
 
 string_distance_dispatchbyname <- function(t, q, name, k) {
