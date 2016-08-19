@@ -17,6 +17,17 @@ BEGIN_RCPP
     return __result;
 END_RCPP
 }
+// persistence_extrema
+NumericVector persistence_extrema(NumericMatrix T);
+RcppExport SEXP trajcomp_persistence_extrema(SEXP TSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject __result;
+    Rcpp::RNGScope __rngScope;
+    Rcpp::traits::input_parameter< NumericMatrix >::type T(TSEXP);
+    __result = Rcpp::wrap(persistence_extrema(T));
+    return __result;
+END_RCPP
+}
 // persistence_bars
 NumericVector persistence_bars(NumericMatrix T, NumericVector it);
 RcppExport SEXP trajcomp_persistence_bars(SEXP TSEXP, SEXP itSEXP) {
@@ -55,8 +66,21 @@ BEGIN_RCPP
     return __result;
 END_RCPP
 }
+// persistence_multires_index
+NumericVector persistence_multires_index(NumericMatrix T, NumericVector Beta, NumericVector Levels);
+RcppExport SEXP trajcomp_persistence_multires_index(SEXP TSEXP, SEXP BetaSEXP, SEXP LevelsSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject __result;
+    Rcpp::RNGScope __rngScope;
+    Rcpp::traits::input_parameter< NumericMatrix >::type T(TSEXP);
+    Rcpp::traits::input_parameter< NumericVector >::type Beta(BetaSEXP);
+    Rcpp::traits::input_parameter< NumericVector >::type Levels(LevelsSEXP);
+    __result = Rcpp::wrap(persistence_multires_index(T, Beta, Levels));
+    return __result;
+END_RCPP
+}
 // persistence_multires
-NumericVector persistence_multires(NumericMatrix T, NumericVector Beta, NumericVector Levels);
+NumericMatrix persistence_multires(NumericMatrix T, NumericVector Beta, NumericVector Levels);
 RcppExport SEXP trajcomp_persistence_multires(SEXP TSEXP, SEXP BetaSEXP, SEXP LevelsSEXP) {
 BEGIN_RCPP
     Rcpp::RObject __result;
