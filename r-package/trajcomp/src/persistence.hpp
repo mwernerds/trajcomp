@@ -2,6 +2,7 @@
 #include <cassert>
 using namespace Rcpp;
 
+
 namespace persistence{
 
 //basic vector math
@@ -105,10 +106,10 @@ Curve traj_to_curve(const std::vector<vec2> &t){
       }
       res[i] = {deg, i, t[i]};
       
-      std::cout << i<<": "<<v1[0]<<", "<<v1[1] <<" | "<<v2[0]<<", "<<v2[1] <<" | "<<deg<<std::endl;
+      //std::cout << i<<": "<<v1[0]<<", "<<v1[1] <<" | "<<v2[0]<<", "<<v2[1] <<" | "<<deg<<std::endl;
     }
   }
-  print_curve(res);
+  //print_curve(res);
   return res;
 };
 
@@ -121,7 +122,7 @@ Extrema extrema(const Curve &curve){
   const int fl_un = 0, fl_min = 1, fl_max = 2;
   Extrema res;
   
-  if(curve.size() < 2){
+  if(curve.size() < 3){
     std::cout <<"CURVE IS EMPTY"<<std::endl;
     return res;
   }
@@ -160,6 +161,13 @@ Extrema extrema(const Curve &curve){
         d_max = x;
       }
     }
+  }
+  
+  //if no min or max found
+  if(res.min.size() == 0 || res.max.size() == 0){
+    res.min.push_back(0);
+    res.max.push_back(curve.size()-1);
+    return res;
   }
   
   //add end, its either min or max
@@ -213,9 +221,10 @@ Result PersistenceAlg(const Curve &curve, double beta = 0.01, int debug_iter = -
   auto min = ex.min;
   auto max = ex.max;
   
-  if(curve.size() < 2 || min.size() == 0 || max.size() == 0){
+  if(curve.size() < 3 || min.size() == 0 || max.size() == 0){
     std::cout <<"EMPTY CURVE"<<std::endl;
     Result x;
+    x.pruned = curve;
     return x;
   }
   auto used = std::vector<int>(curve.size());
@@ -346,7 +355,7 @@ Result PersistenceAlg(const Curve &curve, double beta = 0.01, int debug_iter = -
 
 Curve prune_curve_dist(const Curve &curve, double scale){
   if(curve.size() < 2){
-    return {};
+    return curve;
   }
   Curve res;
   res.reserve(curve.size());
@@ -375,19 +384,21 @@ Curve prune_curve_dist(const Curve &curve, double scale){
 
 Curve persistenceMultiRes(const Curve &curve,  double beta, int levels){
   auto _curve = curve;
-  print_curve(_curve);
+  //print_curve(_curve);
   
   for(int i = 0; i < levels; ++i){
     auto p_result = persistence::PersistenceAlg(_curve, beta, -1);
     _curve = persistence::prune_curve_dist(p_result.pruned, pow(2,i));
-    print_curve(_curve);
+    //print_curve(_curve);
+    
   }
-  print_curve(_curve);
+  //print_curve(_curve);
   return _curve;
 }
 
 }
 //*** END OF NAMESPACE PERSISTENCE ***//
+
 
 
 // [[Rcpp::export]]
@@ -519,12 +530,14 @@ NumericMatrix persistence_multires(NumericMatrix T, NumericVector Beta = 0, Nume
     
     NumericMatrix resultMatrix = NumericMatrix(p_result.size(), 2) ;
     for(int i = 0; i < p_result.size(); i++){
+      /*
       if(p_result[i].vertex.size() == 2){
         std::cout << "v["<<i<<"]: "<< p_result[i].vertex[0] <<", "<<p_result[i].vertex[1] << std::endl;
       }
       else{
         std::cout << "v["<<i<<"]: EMPTY!"<< p_result[i].vertex.size()<<" - " << p_result[i].index << std::endl;
       }
+      */
       NumericVector temp  =  wrap(p_result[i].vertex);
       resultMatrix(i,_) = temp;
     }
