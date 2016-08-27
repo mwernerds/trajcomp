@@ -81,7 +81,7 @@ typedef std::vector<CurveElement> Curve;
 void print_curve(Curve &c){
   for(int i = 0; i < c.size(); i++){
     if(c[i].vertex.size() == 2){
-      std::cout << "v["<<i<<"]: "<< c[i].vertex[0] <<", "<<c[i].vertex[1]
+      std::cout << "v["<<i<<"].("<<c[i].index<<"): "<< c[i].vertex[0] <<", "<<c[i].vertex[1]
                 << " = " << c[i].val
                 << std::endl;
     }
@@ -212,23 +212,28 @@ struct Result{
 };
 
 Curve betaPruning(const std::vector<Bar> &bars, const Curve &curve, double beta = 0.01){
+  //insertion sort structure: std::set<>
   std::set<CurveElement, std::function<bool (const CurveElement&, const CurveElement&)>> pruned([](const CurveElement& a, const CurveElement& b){
     return a.index < b.index;
   });
   
+  auto end_p = curve.size()-1;
+  pruned.insert(curve[0]);
+  pruned.insert(curve[end_p]);
+  
   for(auto b : bars){
+    //prune by beta
     if(curve[b.max].val - curve[b.min].val > beta){
-      pruned.insert(curve[b.min]);
-      pruned.insert(curve[b.max]);
-    }else{
-      if(b.min == 0 || b.min == curve.size()-1){
+      //avoid duplicate start and end
+      if(b.min != 0 && b.min != end_p ){
         pruned.insert(curve[b.min]);
       }
-      if(b.max == 0 || b.max == curve.size()-1 ){
+      if(b.max != 0 && b.max != end_p ){
         pruned.insert(curve[b.max]);
       }
     }
   }
+  //copy out sorted curve
   Curve pruned_curve;
   std::copy(pruned.begin(), pruned.end(), std::back_inserter(pruned_curve));
   return pruned_curve;
@@ -366,9 +371,11 @@ Result PersistenceAlg(const Curve &curve, double beta = 0.01, int debug_iter = -
   
   for(auto c : comps){
     if(c.max >=0){
+      std::cout << " b: " << c.min <<", "<< c.max <<std::endl;
       bars.push_back({c.min,c.max});
     }
   }
+  
   return {bars, comps, used, persistence::betaPruning(bars, curve, beta)};
 };
 
@@ -424,6 +431,8 @@ Curve prune_curve_dist_to_segment(const Curve &curve, double epsilon){
   res.push_back(curve.back());
   return res;
 }
+
+
 void recalc_angles_inplace(Curve &curve){
   for(auto i = 0; i < curve.size(); ++i){
     //edge cases
@@ -457,16 +466,23 @@ void recalc_angles_inplace(Curve &curve){
 
 Curve persistenceMultiRes(const Curve &curve,  double beta, int levels){
   auto _curve = curve;
-  //print_curve(_curve);
+  std::cout<<"START"<<std::endl;
+  print_curve(_curve);
   
   for(int i = 0; i < levels; ++i){
+    if(i != 0){
+      recalc_angles_inplace(_curve);
+    }
     auto p_result = persistence::PersistenceAlg(_curve, beta, -1);
+    std::cout<<"IT: "<<i<<" pruned: "<<std::endl;
+    print_curve(p_result.pruned);
     _curve = persistence::prune_curve_dist(p_result.pruned, pow(2,i));
-    recalc_angles_inplace(_curve);
-    //print_curve(_curve);
+    std::cout<<"IT: "<<i<<std::endl;
+    print_curve(_curve);
     
   }
-  //print_curve(_curve);
+  std::cout<<"END"<<std::endl;
+  print_curve(_curve);
   return _curve;
 }
 
@@ -475,11 +491,11 @@ Curve persistenceDist(const Curve &curve,  double beta, double epsilon, int iter
   //print_curve(_curve);
   
   for(int i = 0; i < iterations; ++i){
+    if(i != 0){
+      recalc_angles_inplace(_curve);
+    }
     auto p_result = persistence::PersistenceAlg(_curve, beta, -1);
     _curve = persistence::prune_curve_dist_to_segment(p_result.pruned, epsilon);
-    recalc_angles_inplace(_curve);
-    //print_curve(_curve);
-    
   }
   //print_curve(_curve);
   return _curve;
@@ -672,8 +688,6 @@ NumericMatrix persistence_dist(NumericMatrix T, NumericVector Beta = 0, NumericV
     }
     return resultMatrix;
 }
-
-
 
 // [[Rcpp::export]]
 NumericVector persistence_test_bars(NumericVector T, NumericVector Beta = 0, NumericVector it = -1) {
