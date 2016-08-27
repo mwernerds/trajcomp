@@ -29,6 +29,10 @@ persistence_multires <- function(T, Beta = 0L, Levels = 5L) {
     .Call('trajcomp_persistence_multires', PACKAGE = 'trajcomp', T, Beta, Levels)
 }
 
+persistence_dist <- function(T, Beta = 0L, Epsilon = 5L, Iterations = 5L) {
+    .Call('trajcomp_persistence_dist', PACKAGE = 'trajcomp', T, Beta, Epsilon, Iterations)
+}
+
 persistence_test_bars <- function(T, Beta = 0L, it = -1L) {
     .Call('trajcomp_persistence_test_bars', PACKAGE = 'trajcomp', T, Beta, it)
 }

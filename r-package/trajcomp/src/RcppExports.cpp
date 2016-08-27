@@ -41,7 +41,7 @@ BEGIN_RCPP
 END_RCPP
 }
 // persistence_pruned
-NumericVector persistence_pruned(NumericMatrix T, NumericVector Beta, NumericVector it);
+NumericMatrix persistence_pruned(NumericMatrix T, NumericVector Beta, NumericVector it);
 RcppExport SEXP trajcomp_persistence_pruned(SEXP TSEXP, SEXP BetaSEXP, SEXP itSEXP) {
 BEGIN_RCPP
     Rcpp::RObject __result;
@@ -89,6 +89,20 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< NumericVector >::type Beta(BetaSEXP);
     Rcpp::traits::input_parameter< NumericVector >::type Levels(LevelsSEXP);
     __result = Rcpp::wrap(persistence_multires(T, Beta, Levels));
+    return __result;
+END_RCPP
+}
+// persistence_dist
+NumericMatrix persistence_dist(NumericMatrix T, NumericVector Beta, NumericVector Epsilon, NumericVector Iterations);
+RcppExport SEXP trajcomp_persistence_dist(SEXP TSEXP, SEXP BetaSEXP, SEXP EpsilonSEXP, SEXP IterationsSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject __result;
+    Rcpp::RNGScope __rngScope;
+    Rcpp::traits::input_parameter< NumericMatrix >::type T(TSEXP);
+    Rcpp::traits::input_parameter< NumericVector >::type Beta(BetaSEXP);
+    Rcpp::traits::input_parameter< NumericVector >::type Epsilon(EpsilonSEXP);
+    Rcpp::traits::input_parameter< NumericVector >::type Iterations(IterationsSEXP);
+    __result = Rcpp::wrap(persistence_dist(T, Beta, Epsilon, Iterations));
     return __result;
 END_RCPP
 }

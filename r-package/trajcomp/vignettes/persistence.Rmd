@@ -113,40 +113,40 @@ lines(traj$x, traj$y, col="orange")
 
 pruned <- persistence_pruned(as.matrix(traj), 0)
 #pruned trajectory plot
-plot(traj$x[pruned+1], traj$y[pruned+1], col="black", pch=21,
+plot(pruned, col="black", pch=21,
   main="beta = 0",
   xlab="x-axis",
   ylab="y-axis")
-lines(traj$x[pruned+1], traj$y[pruned+1], col="green")
+lines(pruned, col="green")
 
 pruned <- persistence_pruned(as.matrix(traj), 2)
-plot(traj$x[pruned+1], traj$y[pruned+1], col="black", pch=21,
+plot(pruned, col="black", pch=21,
   main="beta = 2",
   xlab="x-axis",
   ylab="y-axis")
-lines(traj$x[pruned+1], traj$y[pruned+1], col="blue")
+lines(pruned, col="blue")
 
 pruned <- persistence_pruned(as.matrix(traj), 4)
-plot(traj$x[pruned+1], traj$y[pruned+1], col="black", pch=21,
+plot(pruned, col="black", pch=21,
   main="beta = 4",
   xlab="x-axis",
   ylab="y-axis")
-lines(traj$x[pruned+1], traj$y[pruned+1], col="red")
+lines(pruned, col="red")
 
 pruned <- persistence_pruned(as.matrix(traj), 8)
-plot(traj$x[pruned+1], traj$y[pruned+1], col="black", pch=21,
+plot(pruned, col="black", pch=21,
   main="beta = 8",
   xlab="x-axis",
   ylab="y-axis")
-lines(traj$x[pruned+1], traj$y[pruned+1], col="orange")
+lines(pruned, col="orange")
 
 
 pruned <- persistence_pruned(as.matrix(traj), 16)
-plot(traj$x[pruned+1], traj$y[pruned+1], col="black", pch=21,
+plot(pruned, col="black", pch=21,
   main="beta = 16",
   xlab="x-axis",
   ylab="y-axis")
-lines(traj$x[pruned+1], traj$y[pruned+1], col="purple")
+lines(pruned, col="purple")
 
 ```
 
@@ -178,39 +178,39 @@ lines(traj$x, traj$y, col="orange")
 
 
 pruned <- persistence_multires(as.matrix(traj), 2, 1)
-plot(traj$x[pruned+1], traj$y[pruned+1], col="black", pch=21,
+plot(pruned, col="black", pch=21,
   main="beta = 2, levels = 1",
   xlab="x-axis",
   ylab="y-axis")
-lines(traj$x[pruned+1], traj$y[pruned+1], col="green")
+lines(pruned, col="green")
 
 pruned <- persistence_multires(as.matrix(traj), 2, 2)
-plot(traj$x[pruned+1], traj$y[pruned+1], col="black", pch=21,
+plot(pruned, col="black", pch=21,
   main="beta = 2, levels = 2",
   xlab="x-axis",
   ylab="y-axis")
-lines(traj$x[pruned+1], traj$y[pruned+1], col="blue")
+lines(pruned, col="blue")
 
 pruned <- persistence_multires(as.matrix(traj), 2, 3)
-plot(traj$x[pruned+1], traj$y[pruned+1], col="black", pch=21,
+plot(pruned, col="black", pch=21,
   main="beta = 2, levels = 3",
   xlab="x-axis",
   ylab="y-axis")
-lines(traj$x[pruned+1], traj$y[pruned+1], col="red")
+lines(pruned, col="red")
 
 pruned <- persistence_multires(as.matrix(traj), 2, 4)
-plot(traj$x[pruned+1], traj$y[pruned+1], col="black", pch=21,
+plot(pruned, col="black", pch=21,
   main="beta = 2, levels = 4",
   xlab="x-axis",
   ylab="y-axis")
-lines(traj$x[pruned+1], traj$y[pruned+1], col="orange")
+lines(pruned, col="orange")
 
 pruned <- persistence_multires(as.matrix(traj), 2, 5)
-plot(traj$x[pruned+1], traj$y[pruned+1], col="black", pch=21,
+plot(pruned, col="black", pch=21,
   main="beta = 2, levels = 5",
   xlab="x-axis",
   ylab="y-axis")
-lines(traj$x[pruned+1], traj$y[pruned+1], col="purple")
+lines(pruned, col="purple")
 
 ```
 
@@ -236,39 +236,39 @@ lines(traj$x, traj$y, col="orange")
 
 
 pruned <- persistence_multires(as.matrix(traj), 4, 1)
-plot(traj$x[pruned+1], traj$y[pruned+1], col="black", pch=21,
+plot(pruned, col="black", pch=21,
   main="beta = 4, levels = 1",
   xlab="x-axis",
   ylab="y-axis")
-lines(traj$x[pruned+1], traj$y[pruned+1], col="green")
+lines(pruned, col="green")
 
 pruned <- persistence_multires(as.matrix(traj), 4, 2)
-plot(traj$x[pruned+1], traj$y[pruned+1], col="black", pch=21,
+plot(pruned, col="black", pch=21,
   main="beta = 4, levels = 2",
   xlab="x-axis",
   ylab="y-axis")
-lines(traj$x[pruned+1], traj$y[pruned+1], col="blue")
+lines(pruned, col="blue")
 
 pruned <- persistence_multires(as.matrix(traj), 4, 3)
-plot(traj$x[pruned+1], traj$y[pruned+1], col="black", pch=21,
+plot(pruned, col="black", pch=21,
   main="beta = 4, levels = 3",
   xlab="x-axis",
   ylab="y-axis")
-lines(traj$x[pruned+1], traj$y[pruned+1], col="red")
+lines(pruned, col="red")
 
 pruned <- persistence_multires(as.matrix(traj), 4, 4)
-plot(traj$x[pruned+1], traj$y[pruned+1], col="black", pch=21,
+plot(pruned, col="black", pch=21,
   main="beta = 4, levels = 4",
   xlab="x-axis",
   ylab="y-axis")
-lines(traj$x[pruned+1], traj$y[pruned+1], col="orange")
+lines(pruned, col="orange")
 
 pruned <- persistence_multires(as.matrix(traj), 4, 5)
-plot(traj$x[pruned+1], traj$y[pruned+1], col="black", pch=21,
+plot(pruned, col="black", pch=21,
   main="beta = 4, levels = 5",
   xlab="x-axis",
   ylab="y-axis")
-lines(traj$x[pruned+1], traj$y[pruned+1], col="purple")
+lines(pruned, col="purple")
 
 ```
 
@@ -295,39 +295,135 @@ lines(traj$x, traj$y, col="orange")
 
 
 pruned <- persistence_multires(as.matrix(traj), 8, 1)
-plot(traj$x[pruned+1], traj$y[pruned+1], col="black", pch=21,
+plot(pruned, col="black", pch=21,
   main="beta = 8, levels = 1",
   xlab="x-axis",
   ylab="y-axis")
-lines(traj$x[pruned+1], traj$y[pruned+1], col="green")
+lines(pruned, col="green")
 
 pruned <- persistence_multires(as.matrix(traj), 8, 2)
-plot(traj$x[pruned+1], traj$y[pruned+1], col="black", pch=21,
+plot(pruned, col="black", pch=21,
   main="beta = 8, levels = 2",
   xlab="x-axis",
   ylab="y-axis")
-lines(traj$x[pruned+1], traj$y[pruned+1], col="blue")
+lines(pruned, col="blue")
 
 pruned <- persistence_multires(as.matrix(traj), 8, 3)
-plot(traj$x[pruned+1], traj$y[pruned+1], col="black", pch=21,
+plot(pruned, col="black", pch=21,
   main="beta = 8, levels = 3",
   xlab="x-axis",
   ylab="y-axis")
-lines(traj$x[pruned+1], traj$y[pruned+1], col="red")
+lines(pruned, col="red")
 
 pruned <- persistence_multires(as.matrix(traj), 8, 4)
-plot(traj$x[pruned+1], traj$y[pruned+1], col="black", pch=21,
+plot(pruned, col="black", pch=21,
   main="beta = 8, levels = 4",
   xlab="x-axis",
   ylab="y-axis")
-lines(traj$x[pruned+1], traj$y[pruned+1], col="orange")
+lines(pruned, col="orange")
 
 pruned <- persistence_multires(as.matrix(traj), 8, 5)
-plot(traj$x[pruned+1], traj$y[pruned+1], col="black", pch=21,
+plot(pruned, col="black", pch=21,
   main="beta = 8, levels = 5",
   xlab="x-axis",
   ylab="y-axis")
-lines(traj$x[pruned+1], traj$y[pruned+1], col="purple")
+lines(pruned, col="purple")
 
 ```
 
+
+##DIST Simplification with Beta = 8
+```{r, echo=FALSE}
+library(trajcomp)
+data(prague)
+
+#get trajectory
+prague$tid = getTrajectoryIDs(prague); # Add ID column
+# and split on it
+psplit = split (prague, f = prague$tid);
+traj <- psplit[[1]];
+
+
+#trajectory plot
+plot(traj$x, traj$y, col="black", pch=21,
+  main="original trajectory",
+  xlab="x-axis",
+  ylab="y-axis")
+lines(traj$x, traj$y, col="orange")
+
+
+pruned <- persistence_dist(as.matrix(traj), 8, 2, 2)
+plot(pruned, col="black", pch=21,
+  main="beta = 8, levels = 1",
+  xlab="x-axis",
+  ylab="y-axis")
+lines(pruned, col="green")
+
+pruned <- persistence_dist(as.matrix(traj), 8, 4, 2)
+plot(pruned, col="black", pch=21,
+  main="beta = 8, levels = 2",
+  xlab="x-axis",
+  ylab="y-axis")
+lines(pruned, col="blue")
+
+pruned <- persistence_dist(as.matrix(traj), 8, 6, 2)
+plot(pruned, col="black", pch=21,
+  main="beta = 8, levels = 3",
+  xlab="x-axis",
+  ylab="y-axis")
+lines(pruned, col="red")
+
+pruned <- persistence_dist(as.matrix(traj), 8, 8, 2)
+plot(pruned, col="black", pch=21,
+  main="beta = 8, levels = 4",
+  xlab="x-axis",
+  ylab="y-axis")
+lines(pruned, col="orange")
+
+pruned <- persistence_dist(as.matrix(traj), 8, 10, 3)
+plot(pruned, col="black", pch=21,
+  main="beta = 8, levels = 5",
+  xlab="x-axis",
+  ylab="y-axis")
+lines(pruned, col="purple")
+
+```
+
+
+
+````{r}
+library(trajcomp)
+data(prague)
+
+#get trajectory
+prague$tid = getTrajectoryIDs(prague); # Add ID column
+# and split on it
+psplit = split (prague, f = prague$tid);
+for(i in 1:126){
+
+  traj <- psplit[[i]]
+
+  dp<- DouglasPeucker(as.matrix(traj), 32)
+  psd<- persistence_dist(as.matrix(traj),5, 8, 2)
+  psm<- persistence_multires(as.matrix(traj),5, 7)
+  psb<- persistence_pruned(as.matrix(traj),4)
+  
+  plot(traj$x,traj$y, col="yellow")
+  points(dp, col="black", pch=0, cex=0.7)
+  lines(dp, col="black")
+  lines(psm, col="green")
+  points(psm, col="green", pch=2, cex=1.5)
+  lines(psd, col="red")
+  points(psd, col="red", pch=1, cex=1.7)
+  #lines(psb, col="aquamarine3")
+  #points(psb, col="aquamarine3", pch=5, cex=1.0)
+  if(length(psm) <2)
+    text('bottom', "psm empty")
+  legend('topleft',
+         c("original", "DP", "PS MR", "PS D", "PS B"),
+         col = c("yellow","black", "green", "red", "aquamarine3"),
+         lty = c(-1, 1,1,1, 1),
+         pch = c(1, 0, 2, 1, 5),
+         bty="n")
+}
+```

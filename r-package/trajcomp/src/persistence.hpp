@@ -9,12 +9,11 @@ namespace persistence{
 typedef std::vector<double> vec2;
 typedef std::vector<vec2> Trajectory;
 
-double lengthSqr(const vec2 & v){
+double length_sqr(const vec2 & v){
   return v[0] * v[0] + v[1] * v[1];
 }
-
 double length(const vec2 & v){
-  return sqrt(lengthSqr(v));
+  return sqrt(length_sqr(v));
 }
 
 double dot(const vec2 & v, const vec2 & w){
@@ -50,9 +49,25 @@ void normalize(vec2 & v){
 vec2 diff(const vec2 & v, const vec2 & w){
   return {v[0] - w[0], v[1] - w[1]};
 }
+vec2 sum(const vec2 & v, const vec2 & w){
+  return {v[0] + w[0], v[1] + w[1]};
+}
 
 double distance(const vec2 & v, const vec2 & w){
   return length(diff(v,w));
+}
+
+double minimum_distance(const vec2 &v, const vec2 &w, const vec2 &p) {
+  // Return minimum distance between line segment vw and point p
+  const double l2 = length_sqr(diff(v, w));  // i.e. |w-v|^2 -  avoid a sqrt
+  if (l2 == 0.0) return distance(p, v);   // v == w case
+  // Consider the line extending the segment, parameterized as v + t (w - v).
+  // We find projection of point p onto the line. 
+  // It falls where t = [(p-v) . (w-v)] / |w-v|^2
+  // We clamp t from [0,1] to handle points outside the segment vw.
+  const double t = std::max(0.0, std::min(1.0, dot(diff(p , v), diff(w , v)) / l2));
+  const vec2 projection = sum(v ,mult( diff(w , v), t));  // Projection falls on the segment
+  return distance(p, projection);
 }
 
 struct CurveElement{
@@ -205,10 +220,14 @@ Curve betaPruning(const std::vector<Bar> &bars, const Curve &curve, double beta 
     if(curve[b.max].val - curve[b.min].val > beta){
       pruned.insert(curve[b.min]);
       pruned.insert(curve[b.max]);
+    }else{
+      if(b.min == 0 || b.min == curve.size()-1){
+        pruned.insert(curve[b.min]);
+      }
+      if(b.max == 0 || b.max == curve.size()-1 ){
+        pruned.insert(curve[b.max]);
+      }
     }
-    // else{
-    //   std::cout <<"pruned: ["<<b.min<<", "<<b.max<<"]\n";
-    // }
   }
   Curve pruned_curve;
   std::copy(pruned.begin(), pruned.end(), std::back_inserter(pruned_curve));
@@ -382,6 +401,60 @@ Curve prune_curve_dist(const Curve &curve, double scale){
   return res;
 }
 
+Curve prune_curve_dist_to_segment(const Curve &curve, double epsilon){
+  if(curve.size() < 2){
+    return curve;
+  }
+  Curve res;
+  res.reserve(curve.size());
+  res.push_back(curve[0]);
+  vec2 last_pos = curve[0].vertex;
+  for(auto i = 1; i < curve.size()-1;  ++i){
+    auto it = curve[i], it2 = curve[i+1];
+    //check distance
+    if(minimum_distance(last_pos,it2.vertex, it.vertex) < epsilon){
+      last_pos = it2.vertex;
+      ++i;
+    }else{
+      //no pruning
+      last_pos = it.vertex;
+      res.push_back(it);
+    }
+  }
+  res.push_back(curve.back());
+  return res;
+}
+void recalc_angles_inplace(Curve &curve){
+  for(auto i = 0; i < curve.size(); ++i){
+    //edge cases
+    if(i == 0 || i == curve.size()-1){
+      curve[i].val = 0;
+    }else{
+      auto v = curve[i].vertex;
+      auto last = curve[i-1].vertex;
+      auto v1 = diff(last, v);
+      auto next = curve[i+1].vertex;
+      auto v2 = diff(v, next);
+      
+      auto len1 = length(v1);
+      v1[0] *= 1/len1;
+      v1[1] *= 1/len1;
+      
+      auto len2 = length(v2);
+      v2[0] *= 1/len2;
+      v2[1] *= 1/len2;
+      
+      
+      auto value = dot(v1, v2);
+      auto deg = to_deg( acos(value)*lr_sgn(v1, v2) );
+      if(len1 == 0 || len2 == 0){
+        deg = 0;
+      }
+      curve[i].val = deg;
+    }
+  }
+}
+
 Curve persistenceMultiRes(const Curve &curve,  double beta, int levels){
   auto _curve = curve;
   //print_curve(_curve);
@@ -389,6 +462,7 @@ Curve persistenceMultiRes(const Curve &curve,  double beta, int levels){
   for(int i = 0; i < levels; ++i){
     auto p_result = persistence::PersistenceAlg(_curve, beta, -1);
     _curve = persistence::prune_curve_dist(p_result.pruned, pow(2,i));
+    recalc_angles_inplace(_curve);
     //print_curve(_curve);
     
   }
@@ -396,8 +470,23 @@ Curve persistenceMultiRes(const Curve &curve,  double beta, int levels){
   return _curve;
 }
 
+Curve persistenceDist(const Curve &curve,  double beta, double epsilon, int iterations){
+  auto _curve = curve;
+  //print_curve(_curve);
+  
+  for(int i = 0; i < iterations; ++i){
+    auto p_result = persistence::PersistenceAlg(_curve, beta, -1);
+    _curve = persistence::prune_curve_dist_to_segment(p_result.pruned, epsilon);
+    recalc_angles_inplace(_curve);
+    //print_curve(_curve);
+    
+  }
+  //print_curve(_curve);
+  return _curve;
 }
-//*** END OF NAMESPACE PERSISTENCE ***//
+
+
+}//*** END OF NAMESPACE PERSISTENCE ***//
 
 
 
@@ -455,7 +544,7 @@ NumericVector persistence_bars(NumericMatrix T, NumericVector it = -1) {
 }
 
 // [[Rcpp::export]]
-NumericVector persistence_pruned(NumericMatrix T, NumericVector Beta = 0,  NumericVector it = -1) {
+NumericMatrix persistence_pruned(NumericMatrix T, NumericVector Beta = 0,  NumericVector it = -1) {
   persistence::Trajectory trajectory;
 
   for (size_t i=0; i < T.nrow(); i++)		//@todo: remove copy by an adapter class @Martin
@@ -464,12 +553,21 @@ NumericVector persistence_pruned(NumericMatrix T, NumericVector Beta = 0,  Numer
   auto curve = persistence::traj_to_curve(trajectory);
   auto p_result = persistence::PersistenceAlg(curve, Beta(0), it(0));
 
-  std::vector<int> pruned;
-  for(auto b : p_result.pruned){
-    pruned.push_back( b.index);
+  NumericMatrix resultMatrix = NumericMatrix(p_result.pruned.size(), 2) ;
+  
+  for(int i = 0; i < p_result.pruned.size(); i++){
+    /*
+     if(p_result[i].vertex.size() == 2){
+     std::cout << "v["<<i<<"]: "<< p_result[i].vertex[0] <<", "<<p_result[i].vertex[1] << std::endl;
+     }
+     else{
+     std::cout << "v["<<i<<"]: EMPTY!"<< p_result[i].vertex.size()<<" - " << p_result[i].index << std::endl;
+     }
+     */
+    NumericVector temp  =  wrap(p_result.pruned[i].vertex);
+    resultMatrix(i,_) = temp;
   }
-
-  return wrap(pruned);
+  return resultMatrix;
 }
 
 // [[Rcpp::export]]
@@ -531,13 +629,13 @@ NumericMatrix persistence_multires(NumericMatrix T, NumericVector Beta = 0, Nume
     NumericMatrix resultMatrix = NumericMatrix(p_result.size(), 2) ;
     for(int i = 0; i < p_result.size(); i++){
       /*
-      if(p_result[i].vertex.size() == 2){
-        std::cout << "v["<<i<<"]: "<< p_result[i].vertex[0] <<", "<<p_result[i].vertex[1] << std::endl;
-      }
-      else{
-        std::cout << "v["<<i<<"]: EMPTY!"<< p_result[i].vertex.size()<<" - " << p_result[i].index << std::endl;
-      }
-      */
+       if(p_result[i].vertex.size() == 2){
+       std::cout << "v["<<i<<"]: "<< p_result[i].vertex[0] <<", "<<p_result[i].vertex[1] << std::endl;
+       }
+       else{
+       std::cout << "v["<<i<<"]: EMPTY!"<< p_result[i].vertex.size()<<" - " << p_result[i].index << std::endl;
+       }
+       */
       NumericVector temp  =  wrap(p_result[i].vertex);
       resultMatrix(i,_) = temp;
     }
@@ -546,6 +644,33 @@ NumericMatrix persistence_multires(NumericMatrix T, NumericVector Beta = 0, Nume
     std::cout<<"ERROR: "<< e <<std::endl;
   }
   return NumericMatrix();
+}
+// [[Rcpp::export]]
+NumericMatrix persistence_dist(NumericMatrix T, NumericVector Beta = 0, NumericVector Epsilon = 5, NumericVector Iterations = 5) {
+  persistence::Trajectory trajectory;
+  
+    for (size_t i=0; i < T.nrow(); i++)		//@todo: remove copy by an adapter class @Martin
+      trajectory.push_back({T(i,0),T(i,1)});
+    
+    auto curve = persistence::traj_to_curve(trajectory);
+    
+    auto p_result = persistence::persistenceDist(curve, Beta(0), Epsilon(0), Iterations(0));
+    
+    NumericMatrix resultMatrix = NumericMatrix(p_result.size(), 2) ;
+    
+    for(int i = 0; i < p_result.size(); i++){
+      /*
+       if(p_result[i].vertex.size() == 2){
+       std::cout << "v["<<i<<"]: "<< p_result[i].vertex[0] <<", "<<p_result[i].vertex[1] << std::endl;
+       }
+       else{
+       std::cout << "v["<<i<<"]: EMPTY!"<< p_result[i].vertex.size()<<" - " << p_result[i].index << std::endl;
+       }
+       */
+      NumericVector temp  =  wrap(p_result[i].vertex);
+      resultMatrix(i,_) = temp;
+    }
+    return resultMatrix;
 }
 
 
