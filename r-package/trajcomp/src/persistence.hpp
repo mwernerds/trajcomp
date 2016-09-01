@@ -113,9 +113,8 @@ Curve traj_to_curve(const std::vector<vec2> &t){
       v2[0] *= 1/len2;
       v2[1] *= 1/len2;
       
-      
       auto value = dot(v1, v2);
-      auto deg = to_deg( acos(value)*lr_sgn(v1, v2) );
+      auto deg = to_deg( acos(value) * lr_sgn(v1, v2) );
       if(len1 == 0 || len2 == 0){
         deg = 0;
       }
@@ -421,6 +420,7 @@ Curve prune_curve_dist_to_segment(const Curve &curve, double epsilon){
     //check distance
     if(minimum_distance(last_pos,it2.vertex, it.vertex) < epsilon){
       last_pos = it2.vertex;
+      res.push_back(it2);
       ++i;
     }else{
       //no pruning
@@ -490,12 +490,13 @@ Curve persistenceDist(const Curve &curve,  double beta, double epsilon, int iter
   auto _curve = curve;
   //print_curve(_curve);
   
+  auto p_result = persistence::PersistenceAlg(_curve, beta, -1);
+  _curve = p_result.pruned;
   for(int i = 0; i < iterations; ++i){
-    if(i != 0){
-      recalc_angles_inplace(_curve);
-    }
-    auto p_result = persistence::PersistenceAlg(_curve, beta, -1);
-    _curve = persistence::prune_curve_dist_to_segment(p_result.pruned, epsilon);
+    // if(i != 0){
+    //   recalc_angles_inplace(_curve);
+    // }
+    _curve = persistence::prune_curve_dist_to_segment(_curve, epsilon);
   }
   //print_curve(_curve);
   return _curve;
