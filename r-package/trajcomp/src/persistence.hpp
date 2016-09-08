@@ -137,7 +137,7 @@ Extrema extrema(const Curve &curve){
   Extrema res;
   
   if(curve.size() < 3){
-    std::cout <<"CURVE IS EMPTY"<<std::endl;
+    //std::cout <<"CURVE IS EMPTY"<<std::endl;
     return res;
   }
   
@@ -245,7 +245,7 @@ Result PersistenceAlg(const Curve &curve, double beta = 0.01, int debug_iter = -
   auto max = ex.max;
   
   if(curve.size() < 3 || min.size() == 0 || max.size() == 0){
-    std::cout <<"EMPTY CURVE"<<std::endl;
+    //std::cout <<"EMPTY CURVE"<<std::endl;
     Result x;
     x.pruned = curve;
     return x;
@@ -370,7 +370,7 @@ Result PersistenceAlg(const Curve &curve, double beta = 0.01, int debug_iter = -
   
   for(auto c : comps){
     if(c.max >=0){
-      std::cout << " b: " << c.min <<", "<< c.max <<std::endl;
+      //std::cout << " b: " << c.min <<", "<< c.max <<std::endl;
       bars.push_back({c.min,c.max});
     }
   }
@@ -466,27 +466,27 @@ void recalc_angles_inplace(Curve &curve){
 
 Curve persistenceMultiRes(const Curve &curve,  double beta, int levels){
   auto _curve = curve;
-  std::cout<<"START"<<std::endl;
-  print_curve(_curve);
+  // std::cout<<"START"<<std::endl;
+  // print_curve(_curve);
   
   for(int i = 0; i < levels; ++i){
     if(i != 0){
       recalc_angles_inplace(_curve);
     }
     auto p_result = persistence::PersistenceAlg(_curve, beta, -1);
-    std::cout<<"IT: "<<i<<" pruned: "<<std::endl;
-    print_curve(p_result.pruned);
+    // std::cout<<"IT: "<<i<<" pruned: "<<std::endl;
+    // print_curve(p_result.pruned);
     _curve = persistence::prune_curve_dist(p_result.pruned, pow(2,i));
-    std::cout<<"IT: "<<i<<std::endl;
-    print_curve(_curve);
+    // std::cout<<"IT: "<<i<<std::endl;
+    // print_curve(_curve);
     
   }
-  std::cout<<"END"<<std::endl;
-  print_curve(_curve);
+  // std::cout<<"END"<<std::endl;
+  // print_curve(_curve);
   return _curve;
 }
 
-Curve persistenceDist(const Curve &curve,  double beta, double epsilon, int iterations){
+Curve persistenceDist(const Curve &curve,  double beta, double epsilon, int iterations = 2){
   auto _curve = curve;
   //print_curve(_curve);
   
@@ -504,8 +504,6 @@ Curve persistenceDist(const Curve &curve,  double beta, double epsilon, int iter
 
 
 }//*** END OF NAMESPACE PERSISTENCE ***//
-
-
 
 // [[Rcpp::export]]
 NumericVector persistence_curve(NumericMatrix T) {
@@ -662,6 +660,7 @@ NumericMatrix persistence_multires(NumericMatrix T, NumericVector Beta = 0, Nume
   }
   return NumericMatrix();
 }
+
 // [[Rcpp::export]]
 NumericMatrix persistence_dist(NumericMatrix T, NumericVector Beta = 0, NumericVector Epsilon = 5, NumericVector Iterations = 5) {
   persistence::Trajectory trajectory;

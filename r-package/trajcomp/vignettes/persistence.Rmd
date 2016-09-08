@@ -404,14 +404,16 @@ for(i in 1:126){
   traj <- psplit[[i]]
 
   dp<- DouglasPeucker(as.matrix(traj), 32)
-  psd<- persistence_dist(as.matrix(traj),5, 4, 2)
+  psd<- persistence_dist(as.matrix(traj),5, 32, 2)
   psm<- persistence_multires(as.matrix(traj),6, 7)
   psb<- persistence_pruned(as.matrix(traj),4)
   
-  plot(traj$x,traj$y, col="yellow")
+  plot(traj$x,traj$y, col="yellow",
+       xlab="X-Axis",
+       ylab="Y-Axis")
   usr <- par( "usr" )
-  # points(dp, col="black", pch=0, cex=0.7)
-  # lines(dp, col="black")
+  points(dp, col="black", pch=0, cex=0.7)
+  lines(dp, col="black")
   lines(psm, col="green")
   points(psm, col="green", pch=2, cex=1.5)
   lines(psd, col="red")
@@ -423,7 +425,7 @@ for(i in 1:126){
   
   text(usr[2],usr[4], as.character(i), adj = c( 1, 1 ))
   legend('topleft',
-         c("original", "DP", "PS MR", "PS D", "PS B"),
+         c("original", "DouglasPeucker", "MRS", "SDS"),
          col = c("yellow","black", "green", "red", "aquamarine3"),
          lty = c(-1, 1,1,1, 1),
          pch = c(1, 0, 2, 1, 5),
