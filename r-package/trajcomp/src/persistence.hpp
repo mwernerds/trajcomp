@@ -623,7 +623,7 @@ NumericVector persistence_multires_index(NumericMatrix T, NumericVector Beta = 0
 }
 
 // [[Rcpp::export]]
-NumericMatrix persistence_multires(NumericMatrix T, NumericVector Beta = 0, NumericVector Levels = 5) {
+NumericMatrix PersistenceMRS(NumericMatrix T, NumericVector Beta = 0, NumericVector Levels = 5) {
   persistence::Trajectory trajectory;
   try{
     for (size_t i=0; i < T.nrow(); i++)		//@todo: remove copy by an adapter class @Martin
@@ -662,7 +662,7 @@ NumericMatrix persistence_multires(NumericMatrix T, NumericVector Beta = 0, Nume
 }
 
 // [[Rcpp::export]]
-NumericMatrix persistence_dist(NumericMatrix T, NumericVector Beta = 0, NumericVector Epsilon = 5, NumericVector Iterations = 5) {
+NumericMatrix PersistenceSDS(NumericMatrix T, NumericVector Beta = 0, NumericVector Epsilon = 5, NumericVector Iterations = 5) {
   persistence::Trajectory trajectory;
   
     for (size_t i=0; i < T.nrow(); i++)		//@todo: remove copy by an adapter class @Martin

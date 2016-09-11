@@ -79,22 +79,22 @@ BEGIN_RCPP
     return __result;
 END_RCPP
 }
-// persistence_multires
-NumericMatrix persistence_multires(NumericMatrix T, NumericVector Beta, NumericVector Levels);
-RcppExport SEXP trajcomp_persistence_multires(SEXP TSEXP, SEXP BetaSEXP, SEXP LevelsSEXP) {
+// PersistenceMRS
+NumericMatrix PersistenceMRS(NumericMatrix T, NumericVector Beta, NumericVector Levels);
+RcppExport SEXP trajcomp_PersistenceMRS(SEXP TSEXP, SEXP BetaSEXP, SEXP LevelsSEXP) {
 BEGIN_RCPP
     Rcpp::RObject __result;
     Rcpp::RNGScope __rngScope;
     Rcpp::traits::input_parameter< NumericMatrix >::type T(TSEXP);
     Rcpp::traits::input_parameter< NumericVector >::type Beta(BetaSEXP);
     Rcpp::traits::input_parameter< NumericVector >::type Levels(LevelsSEXP);
-    __result = Rcpp::wrap(persistence_multires(T, Beta, Levels));
+    __result = Rcpp::wrap(PersistenceMRS(T, Beta, Levels));
     return __result;
 END_RCPP
 }
-// persistence_dist
-NumericMatrix persistence_dist(NumericMatrix T, NumericVector Beta, NumericVector Epsilon, NumericVector Iterations);
-RcppExport SEXP trajcomp_persistence_dist(SEXP TSEXP, SEXP BetaSEXP, SEXP EpsilonSEXP, SEXP IterationsSEXP) {
+// PersistenceSDS
+NumericMatrix PersistenceSDS(NumericMatrix T, NumericVector Beta, NumericVector Epsilon, NumericVector Iterations);
+RcppExport SEXP trajcomp_PersistenceSDS(SEXP TSEXP, SEXP BetaSEXP, SEXP EpsilonSEXP, SEXP IterationsSEXP) {
 BEGIN_RCPP
     Rcpp::RObject __result;
     Rcpp::RNGScope __rngScope;
@@ -102,7 +102,7 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< NumericVector >::type Beta(BetaSEXP);
     Rcpp::traits::input_parameter< NumericVector >::type Epsilon(EpsilonSEXP);
     Rcpp::traits::input_parameter< NumericVector >::type Iterations(IterationsSEXP);
-    __result = Rcpp::wrap(persistence_dist(T, Beta, Epsilon, Iterations));
+    __result = Rcpp::wrap(PersistenceSDS(T, Beta, Epsilon, Iterations));
     return __result;
 END_RCPP
 }
