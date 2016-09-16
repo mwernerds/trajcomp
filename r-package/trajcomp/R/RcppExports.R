@@ -78,7 +78,7 @@ getDistanceNames <- function(hSetting) {
     .Call('trajcomp_getDistanceNames', PACKAGE = 'trajcomp', hSetting)
 }
 
-DouglasPeucker <- function(S, epsilon = 0) {
+DouglasPeucker <- function(S, epsilon) {
     .Call('trajcomp_DouglasPeucker', PACKAGE = 'trajcomp', S, epsilon)
 }
 
