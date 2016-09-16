@@ -5,6 +5,10 @@ persistence_curve <- function(T) {
     .Call('trajcomp_persistence_curve', PACKAGE = 'trajcomp', T)
 }
 
+persistence_extrema <- function(T) {
+    .Call('trajcomp_persistence_extrema', PACKAGE = 'trajcomp', T)
+}
+
 persistence_bars <- function(T, it = -1L) {
     .Call('trajcomp_persistence_bars', PACKAGE = 'trajcomp', T, it)
 }
@@ -17,8 +21,16 @@ persistence_comps <- function(T, Beta = 0L, it = -1L) {
     .Call('trajcomp_persistence_comps', PACKAGE = 'trajcomp', T, Beta, it)
 }
 
-persistence_multires <- function(T, Beta = 0L, Levels = 5L) {
-    .Call('trajcomp_persistence_multires', PACKAGE = 'trajcomp', T, Beta, Levels)
+persistence_multires_index <- function(T, Beta = 0L, Levels = 5L) {
+    .Call('trajcomp_persistence_multires_index', PACKAGE = 'trajcomp', T, Beta, Levels)
+}
+
+PersistenceMRS <- function(T, Beta = 0L, Levels = 5L) {
+    .Call('trajcomp_PersistenceMRS', PACKAGE = 'trajcomp', T, Beta, Levels)
+}
+
+PersistenceSDS <- function(T, Beta = 0L, Epsilon = 5L, Iterations = 5L) {
+    .Call('trajcomp_PersistenceSDS', PACKAGE = 'trajcomp', T, Beta, Epsilon, Iterations)
 }
 
 persistence_test_bars <- function(T, Beta = 0L, it = -1L) {
