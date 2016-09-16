@@ -17,7 +17,7 @@ This package provides a few flavors of the the algorithm which shall be explored
 The persistence algorithm works on a curve that is derived from the discrete curvature in each point.
 The package provides the function `persistence_curve` which converts a trajectory to a list of curvature values in degrees. It can be helpful to look at this curve if you are deciding on a value for `Beta` when using Beta-Pruning.
 
-```{r, echo=FALSE}
+```{r}
 library(trajcomp)
 data(prague)
 
@@ -49,7 +49,7 @@ The algorithm builds a connected component graph between the minima and maxima o
 By pruning the the bars, for which the difference between the minimum and the maximum is smaller than the pruning value `beta`, we get Beta-Pruning which will be discussed in the next section.
 
 
-```{r, echo=FALSE}
+```{r}
 library(trajcomp)
 alpha  <- c(0, 9,0 ,-7,-2,-3,6, -2, 1,0)
 
@@ -94,7 +94,7 @@ Also it should be noted that Beta pruning simplifies the trajectory well if  cha
 
 To deal with noise persistence with multiresolution simplification should be used, which will be discussed in the next section.
 
-```{r, echo=FALSE}
+```{r}
 library(trajcomp)
 data(prague)
 
@@ -113,40 +113,40 @@ lines(traj$x, traj$y, col="orange")
 
 pruned <- persistence_pruned(as.matrix(traj), 0)
 #pruned trajectory plot
-plot(traj$x[pruned+1], traj$y[pruned+1], col="black", pch=21,
+plot(pruned, col="black", pch=21,
   main="beta = 0",
   xlab="x-axis",
   ylab="y-axis")
-lines(traj$x[pruned+1], traj$y[pruned+1], col="green")
+lines(pruned, col="green")
 
 pruned <- persistence_pruned(as.matrix(traj), 2)
-plot(traj$x[pruned+1], traj$y[pruned+1], col="black", pch=21,
+plot(pruned, col="black", pch=21,
   main="beta = 2",
   xlab="x-axis",
   ylab="y-axis")
-lines(traj$x[pruned+1], traj$y[pruned+1], col="blue")
+lines(pruned, col="blue")
 
 pruned <- persistence_pruned(as.matrix(traj), 4)
-plot(traj$x[pruned+1], traj$y[pruned+1], col="black", pch=21,
+plot(pruned, col="black", pch=21,
   main="beta = 4",
   xlab="x-axis",
   ylab="y-axis")
-lines(traj$x[pruned+1], traj$y[pruned+1], col="red")
+lines(pruned, col="red")
 
 pruned <- persistence_pruned(as.matrix(traj), 8)
-plot(traj$x[pruned+1], traj$y[pruned+1], col="black", pch=21,
+plot(pruned, col="black", pch=21,
   main="beta = 8",
   xlab="x-axis",
   ylab="y-axis")
-lines(traj$x[pruned+1], traj$y[pruned+1], col="orange")
+lines(pruned, col="orange")
 
 
 pruned <- persistence_pruned(as.matrix(traj), 16)
-plot(traj$x[pruned+1], traj$y[pruned+1], col="black", pch=21,
+plot(pruned, col="black", pch=21,
   main="beta = 16",
   xlab="x-axis",
   ylab="y-axis")
-lines(traj$x[pruned+1], traj$y[pruned+1], col="purple")
+lines(pruned, col="purple")
 
 ```
 
@@ -158,7 +158,7 @@ Levels is an integer value that defines the number of iterations the trajectoriy
 Also it is noteworthy to select both `beta` and `levels` accorinf to your data, to get ideal results.
 
 ##Multiresolution Simplification with Beta = 2
-```{r, echo=FALSE}
+```{r}
 library(trajcomp)
 data(prague)
 
@@ -177,46 +177,46 @@ plot(traj$x, traj$y, col="black", pch=21,
 lines(traj$x, traj$y, col="orange")
 
 
-pruned <- persistence_multires(as.matrix(traj), 2, 1)
-plot(traj$x[pruned+1], traj$y[pruned+1], col="black", pch=21,
+pruned <- PersistenceMRS(as.matrix(traj), 2, 1)
+plot(pruned, col="black", pch=21,
   main="beta = 2, levels = 1",
   xlab="x-axis",
   ylab="y-axis")
-lines(traj$x[pruned+1], traj$y[pruned+1], col="green")
+lines(pruned, col="green")
 
-pruned <- persistence_multires(as.matrix(traj), 2, 2)
-plot(traj$x[pruned+1], traj$y[pruned+1], col="black", pch=21,
+pruned <- PersistenceMRS(as.matrix(traj), 2, 2)
+plot(pruned, col="black", pch=21,
   main="beta = 2, levels = 2",
   xlab="x-axis",
   ylab="y-axis")
-lines(traj$x[pruned+1], traj$y[pruned+1], col="blue")
+lines(pruned, col="blue")
 
-pruned <- persistence_multires(as.matrix(traj), 2, 3)
-plot(traj$x[pruned+1], traj$y[pruned+1], col="black", pch=21,
-  main="beta = 2, levels = 3",
-  xlab="x-axis",
-  ylab="y-axis")
-lines(traj$x[pruned+1], traj$y[pruned+1], col="red")
-
-pruned <- persistence_multires(as.matrix(traj), 2, 4)
-plot(traj$x[pruned+1], traj$y[pruned+1], col="black", pch=21,
+pruned <- PersistenceMRS(as.matrix(traj), 2, 4)
+plot(pruned, col="black", pch=21,
   main="beta = 2, levels = 4",
   xlab="x-axis",
   ylab="y-axis")
-lines(traj$x[pruned+1], traj$y[pruned+1], col="orange")
+lines(pruned, col="red")
 
-pruned <- persistence_multires(as.matrix(traj), 2, 5)
-plot(traj$x[pruned+1], traj$y[pruned+1], col="black", pch=21,
-  main="beta = 2, levels = 5",
+pruned <- PersistenceMRS(as.matrix(traj), 2, 6)
+plot(pruned, col="black", pch=21,
+  main="beta = 2, levels = 6",
   xlab="x-axis",
   ylab="y-axis")
-lines(traj$x[pruned+1], traj$y[pruned+1], col="purple")
+lines(pruned, col="orange")
+
+pruned <- PersistenceMRS(as.matrix(traj), 2, 8)
+plot(pruned, col="black", pch=21,
+  main="beta = 2, levels = 8",
+  xlab="x-axis",
+  ylab="y-axis")
+lines(pruned, col="purple")
 
 ```
 
 
 ##Multiresolution Simplification with Beta = 4
-```{r, echo=FALSE}
+```{r}
 library(trajcomp)
 data(prague)
 
@@ -235,47 +235,47 @@ plot(traj$x, traj$y, col="black", pch=21,
 lines(traj$x, traj$y, col="orange")
 
 
-pruned <- persistence_multires(as.matrix(traj), 4, 1)
-plot(traj$x[pruned+1], traj$y[pruned+1], col="black", pch=21,
+pruned <- PersistenceMRS(as.matrix(traj), 4, 1)
+plot(pruned, col="black", pch=21,
   main="beta = 4, levels = 1",
   xlab="x-axis",
   ylab="y-axis")
-lines(traj$x[pruned+1], traj$y[pruned+1], col="green")
+lines(pruned, col="green")
 
-pruned <- persistence_multires(as.matrix(traj), 4, 2)
-plot(traj$x[pruned+1], traj$y[pruned+1], col="black", pch=21,
+pruned <- PersistenceMRS(as.matrix(traj), 4, 2)
+plot(pruned, col="black", pch=21,
   main="beta = 4, levels = 2",
   xlab="x-axis",
   ylab="y-axis")
-lines(traj$x[pruned+1], traj$y[pruned+1], col="blue")
+lines(pruned, col="blue")
 
-pruned <- persistence_multires(as.matrix(traj), 4, 3)
-plot(traj$x[pruned+1], traj$y[pruned+1], col="black", pch=21,
-  main="beta = 4, levels = 3",
-  xlab="x-axis",
-  ylab="y-axis")
-lines(traj$x[pruned+1], traj$y[pruned+1], col="red")
-
-pruned <- persistence_multires(as.matrix(traj), 4, 4)
-plot(traj$x[pruned+1], traj$y[pruned+1], col="black", pch=21,
+pruned <- PersistenceMRS(as.matrix(traj), 4, 4)
+plot(pruned, col="black", pch=21,
   main="beta = 4, levels = 4",
   xlab="x-axis",
   ylab="y-axis")
-lines(traj$x[pruned+1], traj$y[pruned+1], col="orange")
+lines(pruned, col="red")
 
-pruned <- persistence_multires(as.matrix(traj), 4, 5)
-plot(traj$x[pruned+1], traj$y[pruned+1], col="black", pch=21,
-  main="beta = 4, levels = 5",
+pruned <- PersistenceMRS(as.matrix(traj), 4, 6)
+plot(pruned, col="black", pch=21,
+  main="beta = 4, levels = 6",
   xlab="x-axis",
   ylab="y-axis")
-lines(traj$x[pruned+1], traj$y[pruned+1], col="purple")
+lines(pruned, col="orange")
+
+pruned <- PersistenceMRS(as.matrix(traj), 4, 8)
+plot(pruned, col="black", pch=21,
+  main="beta = 4, levels = 8",
+  xlab="x-axis",
+  ylab="y-axis")
+lines(pruned, col="purple")
 
 ```
 
 
 
 ##Multiresolution Simplification with Beta = 8
-```{r, echo=FALSE}
+```{r}
 library(trajcomp)
 data(prague)
 
@@ -294,40 +294,151 @@ plot(traj$x, traj$y, col="black", pch=21,
 lines(traj$x, traj$y, col="orange")
 
 
-pruned <- persistence_multires(as.matrix(traj), 8, 1)
-plot(traj$x[pruned+1], traj$y[pruned+1], col="black", pch=21,
+pruned <- PersistenceMRS(as.matrix(traj), 8, 1)
+plot(pruned, col="black", pch=21,
   main="beta = 8, levels = 1",
   xlab="x-axis",
   ylab="y-axis")
-lines(traj$x[pruned+1], traj$y[pruned+1], col="green")
+lines(pruned, col="green")
 
-pruned <- persistence_multires(as.matrix(traj), 8, 2)
-plot(traj$x[pruned+1], traj$y[pruned+1], col="black", pch=21,
+pruned <- PersistenceMRS(as.matrix(traj), 8, 2)
+plot(pruned, col="black", pch=21,
   main="beta = 8, levels = 2",
   xlab="x-axis",
   ylab="y-axis")
-lines(traj$x[pruned+1], traj$y[pruned+1], col="blue")
+lines(pruned, col="blue")
 
-pruned <- persistence_multires(as.matrix(traj), 8, 3)
-plot(traj$x[pruned+1], traj$y[pruned+1], col="black", pch=21,
-  main="beta = 8, levels = 3",
-  xlab="x-axis",
-  ylab="y-axis")
-lines(traj$x[pruned+1], traj$y[pruned+1], col="red")
-
-pruned <- persistence_multires(as.matrix(traj), 8, 4)
-plot(traj$x[pruned+1], traj$y[pruned+1], col="black", pch=21,
+pruned <- PersistenceMRS(as.matrix(traj), 8, 4)
+plot(pruned, col="black", pch=21,
   main="beta = 8, levels = 4",
   xlab="x-axis",
   ylab="y-axis")
-lines(traj$x[pruned+1], traj$y[pruned+1], col="orange")
+lines(pruned, col="red")
 
-pruned <- persistence_multires(as.matrix(traj), 8, 5)
-plot(traj$x[pruned+1], traj$y[pruned+1], col="black", pch=21,
-  main="beta = 8, levels = 5",
+pruned <- PersistenceMRS(as.matrix(traj), 8, 6)
+plot(pruned, col="black", pch=21,
+  main="beta = 8, levels = 6",
   xlab="x-axis",
   ylab="y-axis")
-lines(traj$x[pruned+1], traj$y[pruned+1], col="purple")
+lines(pruned, col="orange")
 
+pruned <- PersistenceMRS(as.matrix(traj), 8, 8)
+plot(pruned, col="black", pch=21,
+  main="beta = 8, levels = 8",
+  xlab="x-axis",
+  ylab="y-axis")
+lines(pruned, col="purple")
+
+```
+#Persistence with Segment Distance Simplification
+
+Segment Distance Simplification takes a second parameter called `Epsilon` in addition to `Beta`. 
+The meaning of `Epsilon` is the same here as in the `DouglasPeucker` algorithm. It is the maximum distance from the original trajectory that we allow the simplified version to have. The difference to DouglasPeucker is that we can not fully guarantee this to be true in all cases.
+
+##Segment Distance Simplification with Beta = 5 and Iterations = 3
+```{r}
+library(trajcomp)
+data(prague)
+
+#get trajectory
+prague$tid = getTrajectoryIDs(prague); # Add ID column
+# and split on it
+psplit = split (prague, f = prague$tid);
+traj <- psplit[[1]];
+
+
+#trajectory plot
+plot(traj$x, traj$y, col="black", pch=21,
+  main="original trajectory",
+  xlab="x-axis",
+  ylab="y-axis")
+lines(traj$x, traj$y, col="orange")
+
+
+pruned <- PersistenceSDS(as.matrix(traj), 5, 2, 3)
+plot(pruned, col="black", pch=21,
+  main="beta = 5, epsilon = 2",
+  xlab="x-axis",
+  ylab="y-axis")
+lines(pruned, col="green")
+
+pruned <- PersistenceSDS(as.matrix(traj), 5, 4, 3)
+plot(pruned, col="black", pch=21,
+  main="beta = 5, epsilon = 4",
+  xlab="x-axis",
+  ylab="y-axis")
+lines(pruned, col="blue")
+
+pruned <- PersistenceSDS(as.matrix(traj), 5, 8, 3)
+plot(pruned, col="black", pch=21,
+  main="beta = 5, epsilon = 8",
+  xlab="x-axis",
+  ylab="y-axis")
+lines(pruned, col="red")
+
+pruned <- PersistenceSDS(as.matrix(traj), 5, 16, 3)
+plot(pruned, col="black", pch=21,
+  main="beta = 5, epsilon = 16",
+  xlab="x-axis",
+  ylab="y-axis")
+lines(pruned, col="orange")
+
+pruned <- PersistenceSDS(as.matrix(traj), 5, 32, 3)
+plot(pruned, col="black", pch=21,
+  main="beta = 5, epsilon = 32",
+  xlab="x-axis",
+  ylab="y-axis")
+lines(pruned, col="purple")
+
+```
+
+
+Here is a selection of results for thedifferent flavors of simplification offered:
+
+* DouglasPeucker( epsilon=32)
+* PersistenceSDS( beta=6, levels=7)
+* PersistenceMRS( beta=5, epsilon=32, iterations=3)
+
+
+````{r}
+library(trajcomp)
+data(prague)
+
+#get trajectory
+prague$tid = getTrajectoryIDs(prague); # Add ID column
+# and split on it
+psplit = split (prague, f = prague$tid);
+for(i in 1:16){
+
+  traj <- psplit[[i]]
+
+  dp<- DouglasPeucker(as.matrix(traj), 32)
+  psd<- PersistenceSDS(as.matrix(traj), 5, 32, 3)
+  psm<- PersistenceMRS(as.matrix(traj), 6, 7)
+  psb<- persistence_pruned(as.matrix(traj),4)
+  
+  plot(traj$x,traj$y, col="yellow",
+       xlab="X-Axis",
+       ylab="Y-Axis")
+  usr <- par( "usr" )
+  points(dp, col="black", pch=0, cex=0.7)
+  lines(dp, col="black")
+  lines(psm, col="green")
+  points(psm, col="green", pch=2, cex=1.5)
+  lines(psd, col="red")
+  points(psd, col="red", pch=1, cex=1.7)
+  # lines(psb, col="aquamarine3")
+  # points(psb, col="aquamarine3", pch=5, cex=1.0)
+  if(length(psm) <2)
+    text(usr[1],usr[3], "psm empty")
+  
+  text(usr[2],usr[4], as.character(i), adj = c( 1.25, 1.25 ))
+  legend('topleft',
+         c("original", "DouglasPeucker", "MRS", "SDS"),
+         col = c("yellow","black", "green", "red", "aquamarine3"),
+         lty = c(-1, 1,1,1, 1),
+         pch = c(1, 0, 2, 1, 5),
+         bty="n")
+}
 ```
 
