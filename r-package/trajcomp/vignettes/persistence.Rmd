@@ -330,6 +330,7 @@ plot(pruned, col="black", pch=21,
 lines(pruned, col="purple")
 
 ```
+
 #Persistence with Segment Distance Simplification
 
 Segment Distance Simplification takes a second parameter called `Epsilon` in addition to `Beta`. 
