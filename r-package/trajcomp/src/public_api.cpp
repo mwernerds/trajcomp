@@ -1,6 +1,4 @@
 #include <Rcpp.h>
-// [[Rcpp::depends(RcppProgress)]]
-#include <progress.hpp>
 using namespace Rcpp;
 // abort is following http://gallery.rcpp.org/articles/using-rcppprogress/
 
@@ -31,7 +29,7 @@ namespace pt = boost::property_tree;
 #include "public_api.h"
 
 #include "persistence.hpp"
-
+#include "interrupt.h"
 
 
 std::vector<Settings> gSettings;
@@ -762,19 +760,7 @@ NumericMatrix doPLI(NumericMatrix data, int n) {
 }
 
 
-//~ 
-//~ static void chkIntFn(void *dummy) {
-  //~ R_CheckUserInterrupt();
-//~ }
-//~ 
-//~ // this will call the above in a top-level context so it won't longjmp-out of your context
-//~ bool checkInterrupt() {
-  //~ return (R_ToplevelExec(chkIntFn, NULL) == FALSE);
-//~ }
-//~ 
-//~ struct  R_interrupt  {};
-
-
+/*TRACLUS R INTERFACE */
 
 
 /*Instead of actually providing a progress bar, we abuse this
@@ -788,6 +774,11 @@ class traclus_progress: public trajcomp::traclus_progress_visitor
 	
 	void operator()(size_t i, size_t m, std::string phase)
 	{
+		if (checkInterrupt())
+		{
+			Rcout << "Should abort" << std::endl;
+			stop("Using stop on that");
+		}
 		//~ This is not yet working.
 		//~ if ( Progress::check_abort() )
 		//~ {
@@ -879,3 +870,6 @@ DataFrame cpp_traclus(NumericMatrix TrajectoryDB, double eps, int minLines)
 			Named("cluster") = cluster
 			);
 }
+
+
+

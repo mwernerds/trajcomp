@@ -35,8 +35,8 @@ class tLineSegment
 };
 
 
-//~ static trajcomp::default_element_distance<std::vector<double>> d_euc;
-#define trajcomp::default_element_distance<std::vector<double>> d_euc
+static trajcomp::default_element_distance<std::vector<double>> d_euc;
+//~ #define trajcomp::default_element_distance<std::vector<double>> d_euc
 
 /*Projection point calculation*/
 template<typename sample_type>
