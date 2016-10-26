@@ -31,7 +31,7 @@ public:
   
   BloomFilter()
   {
-	  configure(0,0,-1);
+	  configure(0,0);
   }
   
   BloomFilter(int d, int size)

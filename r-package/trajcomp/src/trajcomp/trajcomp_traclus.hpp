@@ -35,7 +35,8 @@ class tLineSegment
 };
 
 
-trajcomp::default_element_distance<std::vector<double>> d_euc;
+//~ static trajcomp::default_element_distance<std::vector<double>> d_euc;
+#define trajcomp::default_element_distance<std::vector<double>> d_euc
 
 /*Projection point calculation*/
 template<typename sample_type>
@@ -475,8 +476,7 @@ distance_functional &_d, progress_visitor  &pvis)
 		it++;i++;
 		pvis(i,A.size(),"Phase 1: Segment Creation");
 	}
-
-	 
+     
 	 grouping(segments,eps,minLines,_d, pvis);
      pvis.finish();
 	 return segments;

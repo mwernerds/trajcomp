@@ -66,7 +66,7 @@ class geohash_bloom_index
 		size_t i=0; 
 		for (auto it = data.begin(); it != data.end(); it++)
 		{
-			BF bf(cfg_bloom_d,cfg_bloom_size,cfg_seed);
+			BF bf(cfg_bloom_d,cfg_bloom_size); // Remark: there is no seed anymore in libtrajcomp ,cfg_seed);
 			tools::progress(i++,data.size(),"Creating Index");
 
 			std::vector<std::string> set = trajectory2geohashset<Trajectory>(*it,cfg_geohash_length);
@@ -88,7 +88,7 @@ class geohash_bloom_index
 	
 	query_type trajectory_query(Trajectory &t)
 	{
-		query_type bf(cfg_bloom_d,cfg_bloom_size,cfg_seed);
+		query_type bf(cfg_bloom_d,cfg_bloom_size);//,cfg_seed);
 		auto set = trajectory2geohashset(t,cfg_geohash_length);
 		for (auto it = set.begin(); it != set.end(); it++)
 		  bf.add(*it);
