@@ -23,7 +23,7 @@ class CorrelationTree;
 
 		
 /*Geohash Index of Trajectory*/		
-template<class Trajectory, class BF>
+template<class Trajectory, class BF, typename bloom_d_type = size_t>
 class geohash_bloom_index
 {
 	
@@ -31,7 +31,7 @@ class geohash_bloom_index
 	private:
 	std::vector<BF> ftracks; // filter tracks
 	std::vector<size_t> N;   // the number of elements of each filter
-	size_t cfg_bloom_d;
+	bloom_d_type cfg_bloom_d;
 	size_t cfg_bloom_size;
 	size_t cfg_seed;
 	size_t cfg_geohash_length;
@@ -44,7 +44,7 @@ class geohash_bloom_index
 	geohash_bloom_index():cfg_bloom_d(5),cfg_bloom_size(1024),cfg_seed(123), cfg_geohash_length(8)
 	{
 	}
-	geohash_bloom_index(size_t d,size_t size,size_t geohash_length, size_t seed=0):cfg_bloom_d(d),cfg_bloom_size(size),cfg_seed(seed), cfg_geohash_length(geohash_length)
+	geohash_bloom_index(bloom_d_type d,size_t size,size_t geohash_length, size_t seed=0):cfg_bloom_d(d),cfg_bloom_size(size),cfg_seed(seed), cfg_geohash_length(geohash_length)
 	{
 		
 	};
