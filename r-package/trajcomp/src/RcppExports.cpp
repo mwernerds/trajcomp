@@ -268,6 +268,31 @@ BEGIN_RCPP
     return __result;
 END_RCPP
 }
+// geohash
+std::vector<std::string> geohash(NumericMatrix points, size_t len, std::string order);
+RcppExport SEXP trajcomp_geohash(SEXP pointsSEXP, SEXP lenSEXP, SEXP orderSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject __result;
+    Rcpp::RNGScope __rngScope;
+    Rcpp::traits::input_parameter< NumericMatrix >::type points(pointsSEXP);
+    Rcpp::traits::input_parameter< size_t >::type len(lenSEXP);
+    Rcpp::traits::input_parameter< std::string >::type order(orderSEXP);
+    __result = Rcpp::wrap(geohash(points, len, order));
+    return __result;
+END_RCPP
+}
+// geohashdecode
+NumericMatrix geohashdecode(std::vector<std::string> hashes, std::string order);
+RcppExport SEXP trajcomp_geohashdecode(SEXP hashesSEXP, SEXP orderSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject __result;
+    Rcpp::RNGScope __rngScope;
+    Rcpp::traits::input_parameter< std::vector<std::string> >::type hashes(hashesSEXP);
+    Rcpp::traits::input_parameter< std::string >::type order(orderSEXP);
+    __result = Rcpp::wrap(geohashdecode(hashes, order));
+    return __result;
+END_RCPP
+}
 // redSVD
 List redSVD(SEXP AA, int num);
 RcppExport SEXP trajcomp_redSVD(SEXP AASEXP, SEXP numSEXP) {

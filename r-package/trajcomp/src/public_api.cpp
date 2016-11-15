@@ -17,6 +17,7 @@ using namespace Rcpp;
 
 #include<trajcomp/trajcomp.hpp>
 #include<trajcomp/trajcomp_traclus.hpp>
+#include<trajcomp/trajcomp_geohash.hpp>
 #include"edit_distance.hpp"
 #include"dtw_distance.hpp"
 
@@ -873,3 +874,71 @@ DataFrame cpp_traclus(NumericMatrix TrajectoryDB, double eps, int minLines)
 
 
 
+/*Bloom Aggregated Cell Representation*/
+
+//' Transforms a trajectory database into its geohash
+//' 
+//' @param TrajectoryDB a trajectory database giving 2D trajectories split by NaN or NA
+//' @param setting an XML string describing the distance to be used
+//' @return An integer handle to pass the (compiled) XML settings to other functions
+//' @details
+//' Distance functions are described via a specific XML format. Consider reading 
+//' the documentation at \url{trajectorycomputing.com/libtrajcomp-xml} 
+//' @export
+// [[Rcpp::export]]
+std::vector<std::string> geohash(NumericMatrix points, size_t len, std::string order="lonlat")
+{
+	trajcomp::geohash gh;
+	std::vector<std::string> ret(points.nrow());
+	bool reversed;
+	if (order =="lonlat" || order=="longlat") reversed = true; else
+	if (order =="latlon" || order=="latlong") reversed = false; else
+	throw(std::runtime_error("Bad specification of order (parameter 3"));
+	
+	
+    for (size_t i=0; i < points.nrow(); i++)		//@todo: remove copy by an adapter class
+    {
+		if (NumericMatrix::is_na (points(i,0))){ 
+			ret[i] = "";
+		}else
+		{
+			try{			
+				ret[i] = reversed? gh(points(i,1),points(i,0),len):gh(points(i,0),points(i,1),len);
+			}catch(std::runtime_error e)
+			{
+				ret[i] = e.what();
+			}
+
+		}
+	}
+
+
+	return ret;
+}
+
+
+
+//' Decodes a vector of geohashes to center locations
+//' 
+// [[Rcpp::export]]
+NumericMatrix geohashdecode(std::vector<std::string> hashes, std::string order="lonlat")
+{
+	trajcomp::geohash gh;
+	NumericMatrix ret(hashes.size(),2);
+
+	bool reversed;
+	if (order =="lonlat" || order=="longlat") reversed = true; else
+	if (order =="latlon" || order=="latlong") reversed = false; else
+	throw(std::runtime_error("Bad specification of order (parameter 3"));
+	
+	
+    for (size_t i=0; i < hashes.size(); i++)		//@todo: remove copy by an adapter class
+    {			
+		try{
+		reversed? gh.decode(hashes[i], ret(i,1),ret(i,0)):gh.decode(hashes[i], ret(i,0),ret(i,1));
+	}catch(...){}
+	}
+
+
+	return ret;
+}
