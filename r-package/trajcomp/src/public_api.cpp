@@ -500,7 +500,7 @@ SEXP trajectory_distances(NumericMatrix S, NumericMatrix T, int hSetting)
     {
        //work (else collect)
        // for each distance... it is only one ;-)
-       double d;
+       double d=std::numeric_limits<double>::infinity();
        for(int i = 0; i < s.distances.size(); i++){
          
          // if there are no features to encode, dispatch by distance name

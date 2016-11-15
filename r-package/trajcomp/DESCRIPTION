@@ -8,7 +8,8 @@ Maintainer: Martin Werner <martin.werner@ifi.lmu.de>
 Description: Provides libTrajcomp C++ algorithms for R
 License: GPL (>= 2)
 Imports:
-    Rcpp (>= 0.12.2)
+    Rcpp (>= 0.12.2),
+    plyr
 LinkingTo: Rcpp, BH, RcppEigen, RcppProgress
 SystemRequirements: C++11
 NeedsCompilation: yes

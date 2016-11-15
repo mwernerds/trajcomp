@@ -79,7 +79,7 @@ struct CurveElement{
 typedef std::vector<CurveElement> Curve;
 
 void print_curve(Curve &c){
-  for(int i = 0; i < c.size(); i++){
+  for(size_t i = 0; i < c.size(); i++){
     if(c[i].vertex.size() == 2){
       std::cout << "v["<<i<<"].("<<c[i].index<<"): "<< c[i].vertex[0] <<", "<<c[i].vertex[1]
                 << " = " << c[i].val
@@ -94,7 +94,7 @@ void print_curve(Curve &c){
 Curve traj_to_curve(const std::vector<vec2> &t){
   auto res = Curve(t.size());
   
-  for(auto i = 0; i < t.size(); ++i){
+  for(int i = 0; i < t.size(); ++i){
     //edge cases
     if(i == 0 || i == t.size()-1){
       res[i] = {0, i, t[i]};
@@ -145,7 +145,7 @@ Extrema extrema(const Curve &curve){
   auto search = fl_un;
   auto i_un = 0;
   
-  for(auto i = 1; i < curve.size(); ++i){
+  for(size_t i = 1; i < curve.size(); ++i){
     auto x = curve[i];
     if(search == fl_un){
       if(x.val > d_min.val){
@@ -216,7 +216,7 @@ Curve betaPruning(const std::vector<Bar> &bars, const Curve &curve, double beta 
     return a.index < b.index;
   });
   
-  auto end_p = curve.size()-1;
+  int end_p = curve.size()-1;
   pruned.insert(curve[0]);
   pruned.insert(curve[end_p]);
   

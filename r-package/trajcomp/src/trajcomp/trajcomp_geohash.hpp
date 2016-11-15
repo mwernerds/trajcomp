@@ -28,7 +28,9 @@ typedef unsigned __int64 uint64_t;
 #else
 #define __STDC_CONSTANT_MACROS 1
 #include <stdint.h>
+#ifndef UINT64_C
 #define UINT64_C(C) ((uint64_t) C ## ULL)
+#endif
 #endif
 
 
