@@ -1,0 +1,57 @@
+---
+title: "TRACLUS trajectory clustering"
+author: "Martin Werner"
+date: "`r Sys.Date()`"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Vignette Title}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+TRACLUS is a framework for trajectory clustering building on density-based DBSCAN algorithm together with
+segmentation and grouping functionalities. Basically, all trajectories are split into reasonably short segments,
+then these segments are clustered, clusters of trajectories are extracted from clusters of segments and
+the final result is returned. 
+
+# Basic Example
+
+Let us first load the library and a dataset (smallprague) and apply traclus.
+
+```{r}
+library(trajcomp)
+data(smallprague)
+segments = traclus(smallprague, 25,5)
+head(segments)
+```
+
+This returns all segments as created by the internal segmentation of TRACLUS algorithm
+together with a cluster ID. Negative clusters are noise.
+
+```{r}
+library(plyr) # for efficient grouping using ddply
+
+# plot the dataset into the background
+plot(smallprague,t="l",col="gray")
+
+# not actually elegant, but very clear for beginners:
+cluster_to_color <- function(r)
+{
+   if (r == -2){
+      return ("red");
+   }
+   if (r == -1){
+       return("black");
+   }
+   if (r == 0){
+       return ("blue");
+   }
+   if(r == 1){
+      return ("green");
+   }
+}
+# Group by cluster and draw color
+
+ddply(segments,.(cluster),function(x){
+   points(c(x$x1,x$x2),c(x$y1,x$y2),col=cluster_to_color(x$cluster[1]));
+})
+```
