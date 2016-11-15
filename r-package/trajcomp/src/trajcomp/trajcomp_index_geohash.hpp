@@ -56,7 +56,7 @@ class geohash_bloom_index
 
 	void generate(std::vector<Trajectory> &data)
 	{
-		cout << "Generate using " << cfg_geohash_length <<"on" << data.size() <<endl;
+		//~ cout << "Generate using " << cfg_geohash_length <<"on" << data.size() <<endl;
 		geohash gh;
 	
 		ftracks.resize(data.size());
@@ -67,7 +67,7 @@ class geohash_bloom_index
 		for (auto it = data.begin(); it != data.end(); it++)
 		{
 			BF bf(cfg_bloom_d,cfg_bloom_size); // Remark: there is no seed anymore in libtrajcomp ,cfg_seed);
-			tools::progress(i++,data.size(),"Creating Index");
+			//~ tools::progress(i++,data.size(),"Creating Index");
 
 			std::vector<std::string> set = trajectory2geohashset<Trajectory>(*it,cfg_geohash_length);
 			for(size_t i=0; i< set.size(); i++)
@@ -77,7 +77,7 @@ class geohash_bloom_index
 			itN ++;
 			ft ++;
 		}
-		cout << endl;
+		//~ cout << endl;
 	}
 	
 	query_type empty_query()
@@ -128,11 +128,14 @@ class geohash_bloom_index
 	double jaccard(query_type &q, size_t k)
 	{
 		double jac = ( 1 - ( ftracks[k]._eIntersect(q)/ ftracks[k]._eUnion(q)));
-		if (std::isnan(jac))
-		{
-			jac = 1;
-		}
-		return jac;
+		//~ if (std::isfinite(jac))
+		//~ {
+			//~ return jac;
+		//~ }else{
+			//~ return 1;
+		//~ }
+		if (std::isnan(jac)) return 1;
+		return jac; 
 	}
 	
 	double intersect(query_type &q, size_t k)
@@ -206,7 +209,7 @@ class geohash_bloom_index
 			foz_histograms.push_back(createFozHistogram(*it,k));
 			//tools::progress(i++,ft.size(),"Creating Index");
 		}
-		cout << "Done." << endl;
+		//~ cout << "Done." << endl;
 	}
 	
 	std::vector<size_t> fast_subset(query_type &q)
@@ -269,11 +272,11 @@ class geohash_reference_index
 		for (auto it = data.begin(); it != data.end(); it++)
 		{
 			query_type s;
-			tools::progress(i++,data.size(),"Creating Reference Index");
+			//~ tools::progress(i++,data.size(),"Creating Reference Index");
 			*ft = trajectory2geohashset(*it,cfg_geohash_length);
 			ft ++;
 		}
-		cout << endl;
+		//~ cout << endl;
 	}
 	
 	query_type trajectory_query(Trajectory &t)
@@ -305,7 +308,9 @@ class geohash_reference_index
 			u.erase(ulast,u.end());
 			U = u.size();
 			I = A.size() + B.size() - U;
-			return 1-(I/U);
+			auto J=1-(I/U);
+			if (std::isnan(J)) return 1;
+			return J;
 	}
 	
 	double jaccard(query_type &q, size_t k)
