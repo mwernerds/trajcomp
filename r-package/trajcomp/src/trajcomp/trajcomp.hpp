@@ -77,11 +77,11 @@ std::string make_string2(datatype data)
 			return ss.str();
 		}
 
-		void progress(long pos, long size,std::string what="")
+		static void progress(long pos, long size,std::string what="")
 		{
 			std::cout << COL0 << "Progress("<<what<<"): " << pos << "/" << (double)size << "(" << 100*(double)pos/(double)size << "%)" << CTLK;
 		}
-		uint64_t ticks(void)
+		static uint64_t ticks(void)
 		{	
 			struct timeval tv;
 			gettimeofday(&tv, 0);

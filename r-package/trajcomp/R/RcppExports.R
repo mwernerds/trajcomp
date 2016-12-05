@@ -90,19 +90,6 @@ doPLI <- function(data, n) {
     .Call('trajcomp_doPLI', PACKAGE = 'trajcomp', data, n)
 }
 
-#' Clusters trajectories according to the TRACLUS framework
-#' 
-#' @param TrajectoryDB a trajectory database giving 2D trajectories split by NaN or NA
-#' @param setting an XML string describing the distance to be used
-#' @return An integer handle to pass the (compiled) XML settings to other functions
-#' @details
-#' Distance functions are described via a specific XML format. Consider reading 
-#' the documentation at \url{trajectorycomputing.com/libtrajcomp-xml} 
-#' @export
-cpp_traclus <- function(TrajectoryDB, eps, minLines) {
-    .Call('trajcomp_cpp_traclus', PACKAGE = 'trajcomp', TrajectoryDB, eps, minLines)
-}
-
 #' Transforms a trajectory database into its geohash
 #' 
 #' @param TrajectoryDB a trajectory database giving 2D trajectories split by NaN or NA
@@ -124,5 +111,18 @@ geohashdecode <- function(hashes, order = "lonlat") {
 
 redSVD <- function(AA, num) {
     .Call('trajcomp_redSVD', PACKAGE = 'trajcomp', AA, num)
+}
+
+#' Clusters trajectories according to the TRACLUS framework
+#' 
+#' @param TrajectoryDB a trajectory database giving 2D trajectories split by NaN or NA
+#' @param setting an XML string describing the distance to be used
+#' @return An integer handle to pass the (compiled) XML settings to other functions
+#' @details
+#' Distance functions are described via a specific XML format. Consider reading 
+#' the documentation at \url{trajectorycomputing.com/libtrajcomp-xml} 
+#' @export
+cpp_traclus <- function(TrajectoryDB, eps, minLines) {
+    .Call('trajcomp_cpp_traclus', PACKAGE = 'trajcomp', TrajectoryDB, eps, minLines)
 }
 
