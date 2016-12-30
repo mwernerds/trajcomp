@@ -6,8 +6,8 @@ of trajectory computing in efficient implementations and make it accessible for 
 
 >libTrajcomp collects various algorithms from the field of trajectory computing. [Tweet It](https://twitter.com/intent/tweet?text=libTrajcomp+collects+various+algorithms+from+the+field+of+trajectory+computing.&url=http%3A%2F%2Ftrajectorycomputing.com%2F&hashtags=BigData,DataScience&via=trajcomp)
 
-For some notes on the structure of this project and some involved design choices, check
-out the [Design Page](/design)
+For a quick start, head into the [Mini-Tutorial](mini-tutorial.md)
+
 
 If you can give useful comments or even contribute algorithms or patches,
 send them to me via email or [GitHub](https://github.com/mwernerds/trajcomp).
