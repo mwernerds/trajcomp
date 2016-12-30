@@ -1,1 +1,1 @@
-PKG_CPPFLAGS=-I. -Wall -Wno-sign-compare -Wno-unknown-pragmas -Wunused-function
+PKG_CPPFLAGS=-I. -Wall -Wno-sign-compare -Wno-unknown-pragmas -Wno-unused-function
