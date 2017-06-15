@@ -104,9 +104,9 @@ inline void DoMyOperation() { DoMyOperationHelper<sizeof(size_t)>(); }
 				size_t ret;
 				// first build it as a stream
 				std::stringstream stream;
-				stream << seed << s;
+				stream << seed << s ;
 					// calculate hash and store
-					std::vector<uint32_t> hash = murmur(s, seed);
+					std::vector<uint32_t> hash = murmur(stream.str(), 42); // seed removed
 					ret = hash[0] % limit; 
 					return ret;
 			}
