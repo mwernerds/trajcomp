@@ -16,6 +16,7 @@
 
 #include<vector>
 #include<iostream>
+#include<iomanip>
 #include<stdexcept>
 #include<string>
 #include<sstream>
@@ -54,6 +55,7 @@ std::string make_string2(datatype data)
 {
 		std::stringstream ss;
 		typename datatype::iterator it;
+		ss << std::setprecision(std::numeric_limits<typename datatype::value_type::value_type>::digits10 +1) << std::fixed;
 		ss << std::endl;
 		for(it=data.begin(); it != data.end(); it++)
 		{
@@ -71,6 +73,7 @@ std::string make_string2(datatype data)
 		std::string make_string(datatype data)
 		{
 			std::stringstream ss;
+			ss << std::setprecision(std::numeric_limits<typename datatype::value_type>::digits10 +1) << std::fixed;
 			typename datatype::iterator it;
 			for(it=data.begin(); it != data.end(); it++)
 				ss <<  *it << delim;
